@@ -1,9 +1,9 @@
 <?php
-define('DB_HOST', 'localhost');
+define('DB_HOST', 'sql109.infinityfree.com');
 define('DB_PORT', '3306');
-define('DB_NAME', 'secretaria_santa_juana');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_NAME', 'if0_42090933_turnos_sj');
+define('DB_USER', 'if0_42090933');
+define('DB_PASS', '7y9nEuFiDbl9');
 define('DB_CHARSET', 'utf8mb4');
 
 function getDbConnection(): PDO {

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Administración — Secretaría Santa Juana</title>
+<meta name="description" content="Panel de administración del sistema de turnos.">
+<link rel="icon" type="image/png" href="/assets/imgs/fav_icon.png">
+<link rel="stylesheet" href="/assets/css/styles.css">
+<style>
+.top-bar{position:fixed;top:0;left:260px;right:0;height:56px;z-index:700;background:rgba(250,250,248,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between;padding:0 28px;transition:var(--transition)}
+@media(max-width:768px){.top-bar{left:0}}
+.top-bar-left{display:flex;align-items:center;gap:12px}
+.top-bar-title{font-weight:600;font-size:.95rem;color:var(--gray-800)}
+.top-bar-right{display:flex;align-items:center;gap:10px}
+.main-content{padding-top:56px}
+.admin-content{padding:24px 28px 48px}
+@media(max-width:768px){.admin-content{padding:16px}}
+.section-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.section-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:900px){.section-grid-2,.section-grid-3{grid-template-columns:1fr}}
+.queue-hero-card{background:linear-gradient(135deg,var(--black) 0%,#1e1e14 100%);border-radius:var(--radius-lg);padding:28px;position:relative;overflow:hidden;margin-bottom:24px}
+.queue-hero-card::before{content:'';position:absolute;top:-30%;right:5%;width:250px;height:250px;background:radial-gradient(circle,rgba(212,160,23,.18) 0%,transparent 70%);pointer-events:none}
+.queue-hero-inner{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;position:relative;z-index:1}
+.queue-hero-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.4);margin-bottom:6px;font-weight:600}
+.queue-hero-number{font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:700;color:var(--gold);line-height:1}
+.queue-hero-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn-dark{background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.1)}
+.btn-dark:hover{background:rgba(255,255,255,.14);color:var(--white)}
+.btn-gold{background:var(--gold);color:var(--black)}
+.btn-gold:hover{background:var(--gold-deep)}
+.inline-tabs{display:flex;gap:2px;background:var(--gray-100);border-radius:var(--radius-sm);padding:3px}
+.inline-tab{padding:6px 16px;border-radius:6px;font-size:.82rem;font-weight:500;color:var(--gray-400);cursor:pointer;transition:var(--transition)}
+.inline-tab.active{background:var(--white);color:var(--gray-800);box-shadow:var(--shadow-sm)}
+.users-table-wrap,.turns-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+td.td-actions{width:1%;white-space:nowrap}
+.panel-toolbar{padding:14px 20px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.panel-toolbar .search-box{flex:1;min-width:160px;max-width:280px}
+.panel-footer{padding:12px 20px;border-top:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.panel-footer-info{font-size:.8rem;color:var(--gray-400)}
+.turn-number-badge{display:inline-block;background:var(--gold-pale);color:var(--gold-deep);border-radius:6px;padding:2px 10px;font-weight:700;font-size:.85rem;font-family:'Playfair Display',serif}
+.draggable-handle{cursor:grab;color:var(--gray-200);font-size:1.1rem;padding:0 4px}
+.draggable-handle:active{cursor:grabbing}
+</style>
+</head>
+<body data-page="admin">
+<div id="toast-container"></div>
+
+<div class="app-layout">
+
+  <aside class="sidebar" id="admin-sidebar">
+    <div class="sidebar-logo">
+      <img src="/assets/imgs/icon.png" alt="Logo">
+      <span>Secretaría Santa Juana</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Principal</div>
+        <a href="#" class="sidebar-link active" data-section="dashboard">
+          <span class="icon">📊</span> Panel general
+        </a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-section-label">Gestión</div>
+        <a href="#" class="sidebar-link" data-section="turns">
+          <span class="icon">🎫</span> Turnos
+        </a>
+        <a href="#" class="sidebar-link" data-section="users">
+          <span class="icon">👥</span> Usuarios
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="sidebar-user-info">
+        <div class="avatar" id="admin-initial">A</div>
+        <div>
+          <div class="user-name" id="admin-name">Administrador</div>
+          <div class="user-role">Administrador</div>
+        </div>
+      </div>
+      <button id="logout-btn-admin" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;color:rgba(255,255,255,.35);margin-top:6px">Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <div class="main-content">
+
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <button class="btn btn-ghost btn-icon" id="sidebar-toggle" style="display:none;align-items:center;justify-content:center" aria-label="Menú">☰</button>
+        <span class="top-bar-title" id="topbar-title">Panel general</span>
+      </div>
+      <div class="top-bar-right">
+        <span id="conn-status" class="conn-badge disconnected">● Conectando</span>
+        <div class="avatar" id="admin-initial-top" style="width:32px;height:32px;font-size:.8rem">A</div>
+      </div>
+    </div>
+
+    <div class="admin-content">
+
+      <div id="section-dashboard" class="admin-section">
+        <div class="page-header">
+          <div class="page-title">Panel general</div>
+          <div class="page-subtitle">Resumen en tiempo real del sistema de turnos.</div>
+        </div>
+
+        <div class="queue-hero-card">
+          <div class="queue-hero-inner">
+            <div>
+              <div class="queue-hero-label">Turno actual</div>
+              <div class="queue-hero-number" id="current-turn-admin">0</div>
+            </div>
+            <div class="queue-hero-actions">
+              <button id="btn-decrease-turn" class="btn btn-dark btn-sm">− Anterior</button>
+              <button id="btn-increase-turn" class="btn btn-dark btn-sm">+ Siguiente</button>
+              <button id="btn-activate-next" class="btn btn-gold">▶ Llamar siguiente</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-grid" style="margin-bottom:28px">
+          <div class="stat-card">
+            <div class="stat-icon blue">👥</div>
+            <div>
+              <div class="stat-value" id="stat-total-users">0</div>
+              <div class="stat-label">Usuarios registrados</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon gold">🎫</div>
+            <div>
+              <div class="stat-value" id="stat-total-turns">0</div>
+              <div class="stat-label">Turnos totales</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange">⏳</div>
+            <div>
+              <div class="stat-value" id="stat-waiting">0</div>
+              <div class="stat-label">En espera</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">✅</div>
+            <div>
+              <div class="stat-value" id="stat-active">0</div>
+              <div class="stat-label">En atención</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon blue">🏁</div>
+            <div>
+              <div class="stat-value" id="stat-completed">0</div>
+              <div class="stat-label">Completados</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-grid-2">
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Turnos recientes</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Turno</th>
+                    <th>Usuario</th>
+                    <th>Servicio</th>
+                    <th>Estado</th>
+                    <th>Hora</th>
+                  </tr>
+                </thead>
+                <tbody id="recent-turns-body">
+                  <tr><td colspan="5" class="empty-state"><div class="skeleton" style="height:36px;margin:8px 16px;border-radius:4px"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Turnos por servicio</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Servicio</th>
+                    <th>Total</th>
+                    <th>Completados</th>
+                    <th>En espera</th>
+                  </tr>
+                </thead>
+                <tbody id="service-stats-body">
+                  <tr><td colspan="4" class="empty-state"><div class="skeleton" style="height:36px;margin:8px 16px;border-radius:4px"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="section-turns" class="admin-section" style="display:none">
+        <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div class="page-title">Gestión de turnos</div>
+            <div class="page-subtitle">Administra y controla la cola de atención.</div>
+          </div>
+          <button id="btn-new-turn" class="btn btn-primary">+ Nuevo turno</button>
+        </div>
+
+        <div class="panel">
+          <div class="panel-toolbar">
+            <div class="search-box">
+              <input type="search" class="form-control" id="admin-search-turns" placeholder="Buscar turno, usuario...">
+            </div>
+            <div class="filter-tabs">
+              <button class="filter-tab active" data-filter-status="">Todos</button>
+              <button class="filter-tab" data-filter-status="waiting">En espera</button>
+              <button class="filter-tab" data-filter-status="active">Activo</button>
+              <button class="filter-tab" data-filter-status="completed">Completado</button>
+              <button class="filter-tab" data-filter-status="cancelled">Cancelado</button>
+            </div>
+            <span id="turns-total" class="panel-footer-info" style="margin-left:auto"></span>
+          </div>
+          <div class="turns-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:40px"></th>
+                  <th>Turno</th>
+                  <th>Usuario</th>
+                  <th>Servicio</th>
+                  <th>Estado</th>
+                  <th>Pos.</th>
+                  <th>Fecha</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="turns-tbody">
+                <tr><td colspan="8"><div class="skeleton" style="height:40px;border-radius:4px;margin:8px 16px"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="panel-footer">
+            <div id="turns-pagination" class="pagination" style="padding:0"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="section-users" class="admin-section" style="display:none">
+        <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <div class="page-title">Gestión de usuarios</div>
+            <div class="page-subtitle">Administra las cuentas de acceso al sistema.</div>
+          </div>
+          <button id="btn-new-user" class="btn btn-primary">+ Nuevo usuario</button>
+        </div>
+
+        <div class="panel">
+          <div class="panel-toolbar">
+            <div class="search-box">
+              <input type="search" class="form-control" id="admin-search-users" placeholder="Buscar nombre, correo, teléfono...">
+            </div>
+            <span id="users-total" class="panel-footer-info" style="margin-left:auto"></span>
+          </div>
+          <div class="users-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Correo</th>
+                  <th>Teléfono</th>
+                  <th>Rol</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="users-tbody">
+                <tr><td colspan="7"><div class="skeleton" style="height:40px;border-radius:4px;margin:8px 16px"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="panel-footer">
+            <div id="users-pagination" class="pagination" style="padding:0"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-user">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="user-modal-title">Nuevo usuario</h3>
+      <button class="modal-close" aria-label="Cerrar">✕</button>
+    </div>
+    <form id="user-form" novalidate>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="u-name">Nombre completo</label>
+          <input class="form-control" type="text" id="u-name" name="name" placeholder="Nombre completo" required>
+          <span class="form-error" id="err-name"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="u-email">Correo electrónico</label>
+          <input class="form-control" type="email" id="u-email" name="email" placeholder="correo@ejemplo.com" required>
+          <span class="form-error" id="err-email"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="u-phone">Teléfono</label>
+          <input class="form-control" type="tel" id="u-phone" name="phone" placeholder="300 000 0000">
+        </div>
+        <div class="form-group" id="user-pass-field">
+          <label class="form-label" for="u-password">Contraseña</label>
+          <input class="form-control" type="password" id="u-password" name="password" placeholder="Mínimo 8 caracteres">
+          <span class="form-error" id="err-password"></span>
+        </div>
+        <div class="form-group" id="user-pass-change" style="display:none">
+          <label class="form-label" for="u-new-password">Nueva contraseña <span style="color:var(--gray-400);font-weight:400">(dejar vacío para no cambiar)</span></label>
+          <input class="form-control" type="password" id="u-new-password" name="new_password" placeholder="Nueva contraseña (opcional)">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="u-role">Rol</label>
+            <select class="form-control" id="u-role" name="role">
+              <option value="user">Usuario</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label" for="u-active">Estado</label>
+            <select class="form-control" id="u-active" name="is_active">
+              <option value="1">Activo</option>
+              <option value="0">Inactivo</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-user')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-turn-admin">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="turn-modal-title">Nuevo turno</h3>
+      <button class="modal-close" aria-label="Cerrar">✕</button>
+    </div>
+    <form id="turn-form-admin" novalidate>
+      <div class="modal-body">
+        <div class="form-group" id="turn-user-group">
+          <label class="form-label" for="turn-user-select">Usuario</label>
+          <select class="form-control" id="turn-user-select">
+            <option value="">— Seleccionar usuario —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="turn-service-admin">Servicio</label>
+          <select class="form-control" id="turn-service-admin">
+          </select>
+        </div>
+        <div class="form-group" id="turn-status-group" style="display:none">
+          <label class="form-label" for="turn-status-admin">Estado</label>
+          <select class="form-control" id="turn-status-admin">
+            <option value="waiting">En espera</option>
+            <option value="active">Activo</option>
+            <option value="completed">Completado</option>
+            <option value="cancelled">Cancelado</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label" for="turn-notes-admin">Notas <span style="color:var(--gray-400);font-weight:400">(opcional)</span></label>
+          <textarea class="form-control" id="turn-notes-admin" placeholder="Notas adicionales..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-turn-admin')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="/assets/js/app.js"></script>
+<script>
+const sidebarToggle = document.getElementById('sidebar-toggle');
+if (sidebarToggle) {
+  if (window.innerWidth <= 768) sidebarToggle.style.display = 'flex';
+  window.addEventListener('resize', () => {
+    sidebarToggle.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
+  });
+}
+
+const sectionTitles = { dashboard: 'Panel general', turns: 'Gestión de turnos', users: 'Gestión de usuarios' };
+const _origShowSection = typeof showSection === 'function' ? showSection : null;
+
+function showSectionTitle(name) {
+  const el = document.getElementById('topbar-title');
+  if (el) el.textContent = sectionTitles[name] || name;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.sidebar-link[data-section]').forEach(link => {
+    link.addEventListener('click', () => showSectionTitle(link.dataset.section));
+  });
+
+  const adminInitialTop = document.getElementById('admin-initial-top');
+  const adminInitial = document.getElementById('admin-initial');
+  const mutObs = new MutationObserver(() => {
+    if (adminInitial && adminInitialTop) adminInitialTop.textContent = adminInitial.textContent;
+  });
+  if (adminInitial) mutObs.observe(adminInitial, { childList: true });
+
+  const turnStatusGroup = document.getElementById('turn-status-group');
+  const turnUserGroup = document.getElementById('turn-user-group');
+  const originalOpenTurnModal = typeof openTurnModal === 'function' ? openTurnModal : null;
+  if (originalOpenTurnModal) {
+    window._patchedTurnModal = true;
+  }
+
+  const observer = new MutationObserver(() => {
+    const form = document.getElementById('turn-form-admin');
+    if (!form) return;
+    const isEdit = !!form.dataset.id;
+    if (turnStatusGroup) turnStatusGroup.style.display = isEdit ? '' : 'none';
+    if (turnUserGroup) turnUserGroup.style.display = isEdit ? 'none' : '';
+  });
+  const form = document.getElementById('turn-form-admin');
+  if (form) observer.observe(form, { attributes: true, attributeFilter: ['data-id'] });
+});
+</script>
+</body>
+</html>

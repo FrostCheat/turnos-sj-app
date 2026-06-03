@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ingresar — Secretaría Santa Juana</title>
+<meta name="description" content="Inicia sesión o regístrate para gestionar tu turno en la Secretaría Santa Juana.">
+<link rel="icon" type="image/png" href="/assets/imgs/fav_icon.png">
+<link rel="stylesheet" href="/assets/css/styles.css">
+<style>
+.pw-toggle{position:relative}
+.pw-toggle input{padding-right:44px}
+.pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:1.1rem;padding:4px;line-height:1;transition:var(--transition)}
+.pw-eye:hover{color:var(--gray-800)}
+.strength-bar{height:3px;border-radius:2px;margin-top:6px;display:flex;gap:3px}
+.strength-bar span{flex:1;border-radius:2px;background:var(--gray-200);transition:background .3s}
+.strength-bar.s1 span:nth-child(1){background:var(--danger)}
+.strength-bar.s2 span:nth-child(-n+2){background:var(--warning)}
+.strength-bar.s3 span:nth-child(-n+3){background:var(--gold)}
+.strength-bar.s4 span{background:var(--success)}
+.strength-label{font-size:.72rem;color:var(--gray-400);margin-top:3px}
+.auth-divider{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--gray-400);font-size:.8rem}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--gray-200)}
+.back-link{display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,.45);font-size:.82rem;margin-bottom:20px;transition:var(--transition);text-decoration:none}
+.back-link:hover{color:var(--gold)}
+.back-link svg{width:14px;height:14px}
+</style>
+</head>
+<body data-page="auth">
+<div id="toast-container"></div>
+
+<div class="auth-bg"></div>
+
+<div class="auth-page">
+  <div class="auth-container">
+
+    <a href="/" class="back-link">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 12L6 8l4-4"/>
+      </svg>
+      Volver al inicio
+    </a>
+
+    <div class="auth-logo">
+      <img src="/assets/imgs/icon.png" alt="Logo Secretaría Santa Juana">
+      <h1>Secretaría Santa Juana</h1>
+      <p>Sistema de Gestión de Turnos</p>
+    </div>
+
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <div class="auth-tab active" data-tab="login">Iniciar sesión</div>
+        <div class="auth-tab" data-tab="register">Registrarse</div>
+      </div>
+
+      <div class="auth-panel active" id="panel-login">
+        <form id="login-form" novalidate autocomplete="on">
+          <div class="form-group">
+            <label class="form-label" for="login-email">Correo electrónico</label>
+            <input class="form-control" type="email" id="login-email" name="email" placeholder="tu@correo.com" required autocomplete="email">
+            <span class="form-error" id="err-email"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="login-password">Contraseña</label>
+            <div class="pw-toggle">
+              <input class="form-control" type="password" id="login-password" name="password" placeholder="••••••••" required autocomplete="current-password">
+              <button type="button" class="pw-eye" data-target="login-password" aria-label="Mostrar contraseña">👁</button>
+            </div>
+            <span class="form-error" id="err-password"></span>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px">
+            Ingresar
+          </button>
+        </form>
+        <div class="auth-divider">o</div>
+        <p style="text-align:center;font-size:.83rem;color:var(--gray-400)">
+          ¿No tienes cuenta?
+          <button type="button" class="btn btn-ghost btn-sm" data-switch-tab="register" style="padding:2px 6px;font-size:.83rem;color:var(--gold-deep)">Regístrate gratis</button>
+        </p>
+      </div>
+
+      <div class="auth-panel" id="panel-register">
+        <form id="register-form" novalidate autocomplete="off">
+          <div class="form-group">
+            <label class="form-label" for="reg-name">Nombre completo</label>
+            <input class="form-control" type="text" id="reg-name" name="name" placeholder="Juan Pérez" required minlength="2" maxlength="120" autocomplete="name">
+            <span class="form-error" id="err-name"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-email">Correo electrónico</label>
+            <input class="form-control" type="email" id="reg-email" name="email" placeholder="tu@correo.com" required autocomplete="email">
+            <span class="form-error" id="err-reg-email"></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-phone">Teléfono <span style="color:var(--gray-400);font-weight:400">(opcional)</span></label>
+            <input class="form-control" type="tel" id="reg-phone" name="phone" placeholder="300 000 0000" autocomplete="tel">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="reg-password">Contraseña</label>
+            <div class="pw-toggle">
+              <input class="form-control" type="password" id="reg-password" name="password" placeholder="Mínimo 8 caracteres" required autocomplete="new-password">
+              <button type="button" class="pw-eye" data-target="reg-password" aria-label="Mostrar contraseña">👁</button>
+            </div>
+            <div class="strength-bar" id="strength-bar"><span></span><span></span><span></span><span></span></div>
+            <div class="strength-label" id="strength-label"></div>
+            <span class="form-error" id="err-reg-password"></span>
+          </div>
+          <div class="form-group" style="margin-bottom:4px">
+            <label class="form-label" for="reg-password2">Confirmar contraseña</label>
+            <div class="pw-toggle">
+              <input class="form-control" type="password" id="reg-password2" name="password2" placeholder="Repite tu contraseña" required autocomplete="new-password">
+              <button type="button" class="pw-eye" data-target="reg-password2" aria-label="Mostrar contraseña">👁</button>
+            </div>
+            <span class="form-error" id="err-password2"></span>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:16px">
+            Crear cuenta
+          </button>
+        </form>
+        <div class="auth-divider">o</div>
+        <p style="text-align:center;font-size:.83rem;color:var(--gray-400)">
+          ¿Ya tienes cuenta?
+          <button type="button" class="btn btn-ghost btn-sm" data-switch-tab="login" style="padding:2px 6px;font-size:.83rem;color:var(--gold-deep)">Inicia sesión</button>
+        </p>
+      </div>
+
+      <div class="auth-footer">
+        Al continuar aceptas nuestros <a href="#" style="color:var(--gold-deep)">Términos de uso</a> y <a href="#" style="color:var(--gold-deep)">Política de privacidad</a>.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/assets/js/app.js"></script>
+<script>
+document.querySelectorAll('.pw-eye').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const input = document.getElementById(btn.dataset.target);
+    if (!input) return;
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    btn.textContent = show ? '🙈' : '👁';
+  });
+});
+
+document.querySelectorAll('[data-switch-tab]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.switchTab;
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+    document.querySelectorAll('.auth-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tab));
+  });
+});
+
+const pwInput = document.getElementById('reg-password');
+const strengthBar = document.getElementById('strength-bar');
+const strengthLabel = document.getElementById('strength-label');
+const strengthLevels = ['', 'Débil', 'Regular', 'Buena', 'Fuerte'];
+const strengthClasses = ['', 's1', 's2', 's3', 's4'];
+
+function calcStrength(pw) {
+  let score = 0;
+  if (pw.length >= 8) score++;
+  if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[\W_]/.test(pw)) score++;
+  return score;
+}
+
+pwInput?.addEventListener('input', () => {
+  const pw = pwInput.value;
+  const score = pw ? calcStrength(pw) : 0;
+  strengthBar.className = 'strength-bar' + (score ? ' ' + strengthClasses[score] : '');
+  strengthLabel.textContent = pw ? strengthLevels[score] : '';
+});
+</script>
+</body>
+</html>
