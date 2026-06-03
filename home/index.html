@@ -3,292 +3,238 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Administración — Secretaría Santa Juana</title>
-<meta name="description" content="Panel de administración del sistema de turnos.">
+<title>Mi Turno — Secretaría Santa Juana</title>
+<meta name="description" content="Monitorea tu turno en tiempo real en la Secretaría Santa Juana.">
 <link rel="icon" type="image/png" href="/assets/imgs/fav_icon.png">
 <link rel="stylesheet" href="/assets/css/styles.css">
 <style>
-.top-bar{position:fixed;top:0;left:260px;right:0;height:56px;z-index:700;background:rgba(250,250,248,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between;padding:0 28px;transition:var(--transition)}
-@media(max-width:768px){.top-bar{left:0}}
-.top-bar-left{display:flex;align-items:center;gap:12px}
-.top-bar-title{font-weight:600;font-size:.95rem;color:var(--gray-800)}
-.top-bar-right{display:flex;align-items:center;gap:10px}
-.main-content{padding-top:56px}
-.admin-content{padding:24px 28px 48px}
-@media(max-width:768px){.admin-content{padding:16px}}
-.section-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.section-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-@media(max-width:900px){.section-grid-2,.section-grid-3{grid-template-columns:1fr}}
-.queue-hero-card{background:linear-gradient(135deg,var(--black) 0%,#1e1e14 100%);border-radius:var(--radius-lg);padding:28px;position:relative;overflow:hidden;margin-bottom:24px}
-.queue-hero-card::before{content:'';position:absolute;top:-30%;right:5%;width:250px;height:250px;background:radial-gradient(circle,rgba(212,160,23,.18) 0%,transparent 70%);pointer-events:none}
-.queue-hero-inner{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;position:relative;z-index:1}
-.queue-hero-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.4);margin-bottom:6px;font-weight:600}
-.queue-hero-number{font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:700;color:var(--gold);line-height:1}
-.queue-hero-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.btn-dark{background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.1)}
-.btn-dark:hover{background:rgba(255,255,255,.14);color:var(--white)}
-.btn-gold{background:var(--gold);color:var(--black)}
-.btn-gold:hover{background:var(--gold-deep)}
-.inline-tabs{display:flex;gap:2px;background:var(--gray-100);border-radius:var(--radius-sm);padding:3px}
-.inline-tab{padding:6px 16px;border-radius:6px;font-size:.82rem;font-weight:500;color:var(--gray-400);cursor:pointer;transition:var(--transition)}
-.inline-tab.active{background:var(--white);color:var(--gray-800);box-shadow:var(--shadow-sm)}
-.users-table-wrap,.turns-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-td.td-actions{width:1%;white-space:nowrap}
-.panel-toolbar{padding:14px 20px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.panel-toolbar .search-box{flex:1;min-width:160px;max-width:280px}
-.panel-footer{padding:12px 20px;border-top:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.panel-footer-info{font-size:.8rem;color:var(--gray-400)}
-.turn-number-badge{display:inline-block;background:var(--gold-pale);color:var(--gold-deep);border-radius:6px;padding:2px 10px;font-weight:700;font-size:.85rem;font-family:'Playfair Display',serif}
-.draggable-handle{cursor:grab;color:var(--gray-200);font-size:1.1rem;padding:0 4px}
-.draggable-handle:active{cursor:grabbing}
+.home-nav{position:fixed;top:0;left:0;right:0;z-index:900;background:rgba(26,26,20,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.06)}
+.home-nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 24px;max-width:1100px;margin:0 auto}
+.home-nav-brand{display:flex;align-items:center;gap:10px;font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;color:var(--white)}
+.home-nav-brand img{width:32px;height:32px;border-radius:8px}
+.home-nav-right{display:flex;align-items:center;gap:12px}
+.home-nav-user{display:flex;align-items:center;gap:8px}
+.home-nav-user-name{font-size:.88rem;color:rgba(255,255,255,.7)}
+.home-body{padding-top:64px;min-height:100vh;background:var(--black)}
+.home-hero{background:linear-gradient(160deg,var(--black) 0%,#1c1c14 100%);padding:40px 0 32px;position:relative;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.05)}
+.home-hero::before{content:'';position:absolute;top:-30%;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(212,160,23,.1) 0%,transparent 70%);pointer-events:none}
+.hero-inner{max-width:1100px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+.hero-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.4);margin-bottom:10px;font-weight:600}
+.hero-turn-number{font-family:'Playfair Display',serif;font-size:clamp(5rem,18vw,9rem);font-weight:700;color:var(--gold);line-height:1;text-shadow:0 0 80px rgba(212,160,23,.3)}
+.hero-turn-number.no-turn{color:rgba(255,255,255,.15);font-size:clamp(3rem,10vw,5rem)}
+.hero-service{font-size:.92rem;color:rgba(255,255,255,.45);margin-top:6px}
+.hero-meta{display:flex;align-items:center;gap:16px;margin-top:20px;flex-wrap:wrap}
+.hero-meta-item{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(--radius-sm);padding:8px 14px}
+.hero-meta-icon{font-size:1rem}
+.hero-meta-label{font-size:.72rem;color:rgba(255,255,255,.35);display:block}
+.hero-meta-value{font-size:.9rem;font-weight:600;color:rgba(255,255,255,.8);display:block}
+.home-main{max-width:1100px;margin:0 auto;padding:28px 24px 48px}
+.home-grid{display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start}
+.my-turn-panel{background:rgba(255,255,255,.03);border:1px solid rgba(212,160,23,.2);border-radius:var(--radius-lg);overflow:hidden}
+.my-turn-header{padding:20px 24px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between}
+.my-turn-header-title{font-size:.82rem;font-weight:600;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em}
+.my-turn-body{padding:28px 24px}
+.my-turn-number-big{font-family:'Playfair Display',serif;font-size:4.5rem;font-weight:700;color:var(--gold-light);line-height:1}
+.my-turn-service-tag{display:inline-block;background:rgba(212,160,23,.12);border:1px solid rgba(212,160,23,.2);border-radius:20px;padding:4px 12px;font-size:.78rem;color:var(--gold);margin-top:8px;margin-bottom:20px}
+.my-turn-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.my-turn-row:last-of-type{border-bottom:none}
+.my-turn-row-label{font-size:.8rem;color:rgba(255,255,255,.35)}
+.my-turn-row-value{font-size:.88rem;font-weight:600;color:rgba(255,255,255,.75)}
+.prog-wrap{margin-top:16px}
+.prog-label{display:flex;justify-content:space-between;font-size:.75rem;color:rgba(255,255,255,.35);margin-bottom:6px}
+.prog-track{height:6px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.no-turn-panel{background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.08);border-radius:var(--radius-lg);padding:40px 24px;text-align:center}
+.no-turn-icon{font-size:2.8rem;margin-bottom:12px}
+.no-turn-title{font-size:1.1rem;font-weight:600;color:rgba(255,255,255,.6);margin-bottom:8px}
+.no-turn-desc{font-size:.85rem;color:rgba(255,255,255,.3);margin-bottom:24px}
+.sidebar-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
+.sidebar-card-header{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.05);font-size:.78rem;font-weight:600;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;justify-content:space-between}
+.sidebar-card-body{padding:16px 18px}
+.queue-stat{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.queue-stat:last-child{border-bottom:none}
+.queue-stat-label{font-size:.82rem;color:rgba(255,255,255,.4);display:flex;align-items:center;gap:8px}
+.queue-stat-value{font-size:1rem;font-weight:700;color:rgba(255,255,255,.8);font-family:'Playfair Display',serif}
+.service-list{display:flex;flex-direction:column;gap:6px}
+.service-chip{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-sm);padding:10px 14px;font-size:.83rem;color:rgba(255,255,255,.55);cursor:pointer;transition:var(--transition)}
+.service-chip:hover{border-color:rgba(212,160,23,.3);color:var(--gold)}
+.service-chip.selected{border-color:var(--gold);background:rgba(212,160,23,.08);color:var(--gold)}
+.active-turn-card{background:linear-gradient(135deg,rgba(30,126,52,.15) 0%,rgba(30,126,52,.06) 100%);border:1px solid rgba(30,126,52,.25);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;gap:12px}
+.active-turn-num{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:#4caf7a;line-height:1}
+.active-turn-info{flex:1}
+.active-turn-label{font-size:.72rem;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.08em}
+.active-turn-service{font-size:.85rem;color:rgba(255,255,255,.65);margin-top:2px}
+.pulse-dot{width:8px;height:8px;border-radius:50%;background:#4caf7a;animation:pulse 2s infinite;flex-shrink:0}
+.is-my-turn-banner{background:linear-gradient(135deg,rgba(212,160,23,.2) 0%,rgba(245,200,66,.1) 100%);border:1px solid rgba(212,160,23,.4);border-radius:var(--radius-sm);padding:16px 20px;display:flex;align-items:center;gap:14px;margin-bottom:20px;animation:pulse 2s infinite}
+.is-my-turn-icon{font-size:1.8rem;flex-shrink:0}
+.is-my-turn-text strong{display:block;color:var(--gold-light);font-size:.95rem;margin-bottom:2px}
+.is-my-turn-text span{font-size:.82rem;color:rgba(255,255,255,.5)}
+.modal-dark .modal{background:var(--gray-800);color:var(--white)}
+.modal-dark .modal-header h3{color:var(--white)}
+.modal-dark .form-label{color:rgba(255,255,255,.6)}
+.modal-dark .form-control{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.12);color:var(--white)}
+.modal-dark .form-control:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,160,23,.15)}
+.modal-dark .form-control::placeholder{color:rgba(255,255,255,.25)}
+.modal-dark select.form-control option{background:var(--gray-800);color:var(--white)}
+.modal-dark .modal-close{color:rgba(255,255,255,.4)}
+.modal-dark .modal-close:hover{background:rgba(255,255,255,.08);color:var(--white)}
+@media(max-width:900px){.home-grid{grid-template-columns:1fr}}
+@media(max-width:480px){.home-nav-user-name{display:none}.hero-meta{gap:8px}}
 </style>
 </head>
-<body data-page="admin">
+<body data-page="home">
 <div id="toast-container"></div>
 
-<div class="app-layout">
-
-  <aside class="sidebar" id="admin-sidebar">
-    <div class="sidebar-logo">
+<nav class="home-nav">
+  <div class="home-nav-inner">
+    <div class="home-nav-brand">
       <img src="/assets/imgs/icon.png" alt="Logo">
       <span>Secretaría Santa Juana</span>
     </div>
-
-    <nav class="sidebar-nav">
-      <div class="sidebar-section">
-        <div class="sidebar-section-label">Principal</div>
-        <a href="#" class="sidebar-link active" data-section="dashboard">
-          <span class="icon">📊</span> Panel general
-        </a>
+    <div class="home-nav-right">
+      <span id="conn-status" class="conn-badge disconnected">● Conectando</span>
+      <div class="home-nav-user">
+        <div class="avatar" id="user-initial" style="width:32px;height:32px;font-size:.78rem">?</div>
+        <span class="home-nav-user-name" id="user-name">Cargando...</span>
       </div>
-      <div class="sidebar-section">
-        <div class="sidebar-section-label">Gestión</div>
-        <a href="#" class="sidebar-link" data-section="turns">
-          <span class="icon">🎫</span> Turnos
-        </a>
-        <a href="#" class="sidebar-link" data-section="users">
-          <span class="icon">👥</span> Usuarios
-        </a>
-      </div>
-    </nav>
-
-    <div class="sidebar-user">
-      <div class="sidebar-user-info">
-        <div class="avatar" id="admin-initial">A</div>
-        <div>
-          <div class="user-name" id="admin-name">Administrador</div>
-          <div class="user-role">Administrador</div>
-        </div>
-      </div>
-      <button id="logout-btn-admin" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;color:rgba(255,255,255,.35);margin-top:6px">Cerrar sesión</button>
+      <button id="logout-btn" class="btn btn-ghost btn-sm" style="color:rgba(255,255,255,.45);padding:6px 10px">Salir</button>
     </div>
-  </aside>
+  </div>
+</nav>
 
-  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+<div class="home-body">
 
-  <div class="main-content">
-
-    <div class="top-bar">
-      <div class="top-bar-left">
-        <button class="btn btn-ghost btn-icon" id="sidebar-toggle" style="display:none;align-items:center;justify-content:center" aria-label="Menú">☰</button>
-        <span class="top-bar-title" id="topbar-title">Panel general</span>
-      </div>
-      <div class="top-bar-right">
-        <span id="conn-status" class="conn-badge disconnected">● Conectando</span>
-        <div class="avatar" id="admin-initial-top" style="width:32px;height:32px;font-size:.8rem">A</div>
+  <div class="home-hero">
+    <div class="hero-inner">
+      <div class="hero-label">Turno siendo atendido</div>
+      <div id="current-turn-num" class="hero-turn-number no-turn">—</div>
+      <div id="active-service" class="hero-service">Sin turno activo</div>
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <span class="hero-meta-icon">🕐</span>
+          <span>
+            <span class="hero-meta-label">En espera</span>
+            <span class="hero-meta-value" id="waiting-count">0</span>
+          </span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-icon">📅</span>
+          <span>
+            <span class="hero-meta-label">Fecha</span>
+            <span class="hero-meta-value" id="today-date"></span>
+          </span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-icon">⏰</span>
+          <span>
+            <span class="hero-meta-label">Horario</span>
+            <span class="hero-meta-value">7:00 — 17:00</span>
+          </span>
+        </div>
       </div>
     </div>
+  </div>
 
-    <div class="admin-content">
+  <div class="home-main">
 
-      <div id="section-dashboard" class="admin-section">
-        <div class="page-header">
-          <div class="page-title">Panel general</div>
-          <div class="page-subtitle">Resumen en tiempo real del sistema de turnos.</div>
-        </div>
+    <div id="notif-banner" class="notif-banner hidden">
+      <span>🔔</span>
+      <span style="flex:1;color:var(--gray-700)">Activa las notificaciones para recibir alertas cuando sea tu turno.</span>
+      <button id="enable-notif" class="btn btn-primary btn-sm">Activar</button>
+      <button id="dismiss-notif" class="btn btn-ghost btn-sm" style="color:var(--gray-400)">✕</button>
+    </div>
 
-        <div class="queue-hero-card">
-          <div class="queue-hero-inner">
-            <div>
-              <div class="queue-hero-label">Turno actual</div>
-              <div class="queue-hero-number" id="current-turn-admin">0</div>
-            </div>
-            <div class="queue-hero-actions">
-              <button id="btn-decrease-turn" class="btn btn-dark btn-sm">− Anterior</button>
-              <button id="btn-increase-turn" class="btn btn-dark btn-sm">+ Siguiente</button>
-              <button id="btn-activate-next" class="btn btn-gold">▶ Llamar siguiente</button>
-            </div>
-          </div>
-        </div>
+    <div class="home-grid">
 
-        <div class="stats-grid" style="margin-bottom:28px">
-          <div class="stat-card">
-            <div class="stat-icon blue">👥</div>
-            <div>
-              <div class="stat-value" id="stat-total-users">0</div>
-              <div class="stat-label">Usuarios registrados</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon gold">🎫</div>
-            <div>
-              <div class="stat-value" id="stat-total-turns">0</div>
-              <div class="stat-label">Turnos totales</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon orange">⏳</div>
-            <div>
-              <div class="stat-value" id="stat-waiting">0</div>
-              <div class="stat-label">En espera</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon green">✅</div>
-            <div>
-              <div class="stat-value" id="stat-active">0</div>
-              <div class="stat-label">En atención</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon blue">🏁</div>
-            <div>
-              <div class="stat-value" id="stat-completed">0</div>
-              <div class="stat-label">Completados</div>
-            </div>
+      <div>
+        <div id="is-my-turn-banner" class="is-my-turn-banner" style="display:none">
+          <div class="is-my-turn-icon">🔔</div>
+          <div class="is-my-turn-text">
+            <strong>¡Es tu turno ahora!</strong>
+            <span>Por favor acércate a la ventanilla de atención.</span>
           </div>
         </div>
 
-        <div class="section-grid-2">
-          <div class="panel">
-            <div class="panel-header">
-              <span class="panel-title">Turnos recientes</span>
+        <div id="my-turn-section" style="display:none">
+          <div class="my-turn-panel">
+            <div class="my-turn-header">
+              <span class="my-turn-header-title">Mi turno</span>
+              <span id="my-turn-status-badge"></span>
             </div>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Turno</th>
-                    <th>Usuario</th>
-                    <th>Servicio</th>
-                    <th>Estado</th>
-                    <th>Hora</th>
-                  </tr>
-                </thead>
-                <tbody id="recent-turns-body">
-                  <tr><td colspan="5" class="empty-state"><div class="skeleton" style="height:36px;margin:8px 16px;border-radius:4px"></div></td></tr>
-                </tbody>
-              </table>
+            <div class="my-turn-body">
+              <div class="my-turn-number-big" id="my-turn-number">—</div>
+              <div id="my-turn-service-tag" class="my-turn-service-tag"></div>
+              <div class="my-turn-row">
+                <span class="my-turn-row-label">Posición en cola</span>
+                <span class="my-turn-row-value" id="my-turn-position">—</span>
+              </div>
+              <div class="my-turn-row">
+                <span class="my-turn-row-label">Servicio</span>
+                <span class="my-turn-row-value" id="my-turn-service">—</span>
+              </div>
+              <div class="my-turn-row">
+                <span class="my-turn-row-label">Hora de solicitud</span>
+                <span class="my-turn-row-value" id="my-turn-time">—</span>
+              </div>
+              <div class="prog-wrap" id="prog-wrap">
+                <div class="prog-label">
+                  <span>Progreso en cola</span>
+                  <span id="prog-pct">0%</span>
+                </div>
+                <div class="prog-track">
+                  <div class="prog-fill" id="queue-progress" style="width:0%"></div>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:20px">
+                <button id="cancel-turn-btn" class="btn btn-danger btn-sm" style="flex:1;justify-content:center">Cancelar turno</button>
+              </div>
             </div>
           </div>
+        </div>
 
-          <div class="panel">
-            <div class="panel-header">
-              <span class="panel-title">Turnos por servicio</span>
-            </div>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Servicio</th>
-                    <th>Total</th>
-                    <th>Completados</th>
-                    <th>En espera</th>
-                  </tr>
-                </thead>
-                <tbody id="service-stats-body">
-                  <tr><td colspan="4" class="empty-state"><div class="skeleton" style="height:36px;margin:8px 16px;border-radius:4px"></div></td></tr>
-                </tbody>
-              </table>
-            </div>
+        <div id="no-turn-section">
+          <div class="no-turn-panel">
+            <div class="no-turn-icon">🎫</div>
+            <div class="no-turn-title">No tienes un turno activo</div>
+            <div class="no-turn-desc">Solicita un turno para ser atendido. Te notificaremos cuando sea tu momento.</div>
+            <button id="request-turn-btn" class="btn btn-primary btn-lg" style="margin:0 auto">Solicitar turno</button>
           </div>
         </div>
       </div>
 
-      <div id="section-turns" class="admin-section" style="display:none">
-        <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
-          <div>
-            <div class="page-title">Gestión de turnos</div>
-            <div class="page-subtitle">Administra y controla la cola de atención.</div>
+      <div>
+        <div class="sidebar-card">
+          <div class="sidebar-card-header">
+            Turno activo
+            <div class="pulse-dot"></div>
           </div>
-          <button id="btn-new-turn" class="btn btn-primary">+ Nuevo turno</button>
+          <div class="sidebar-card-body">
+            <div id="active-turn-display">
+              <div style="text-align:center;padding:12px 0;color:rgba(255,255,255,.25);font-size:.85rem">Sin turno activo</div>
+            </div>
+          </div>
         </div>
 
-        <div class="panel">
-          <div class="panel-toolbar">
-            <div class="search-box">
-              <input type="search" class="form-control" id="admin-search-turns" placeholder="Buscar turno, usuario...">
+        <div class="sidebar-card">
+          <div class="sidebar-card-header">Estado de la cola</div>
+          <div class="sidebar-card-body">
+            <div class="queue-stat">
+              <span class="queue-stat-label">🕐 En espera</span>
+              <span class="queue-stat-value" id="sb-waiting">0</span>
             </div>
-            <div class="filter-tabs">
-              <button class="filter-tab active" data-filter-status="">Todos</button>
-              <button class="filter-tab" data-filter-status="waiting">En espera</button>
-              <button class="filter-tab" data-filter-status="active">Activo</button>
-              <button class="filter-tab" data-filter-status="completed">Completado</button>
-              <button class="filter-tab" data-filter-status="cancelled">Cancelado</button>
+            <div class="queue-stat">
+              <span class="queue-stat-label">✅ Atendido hoy</span>
+              <span class="queue-stat-value" id="sb-current">—</span>
             </div>
-            <span id="turns-total" class="panel-footer-info" style="margin-left:auto"></span>
-          </div>
-          <div class="turns-table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th style="width:40px"></th>
-                  <th>Turno</th>
-                  <th>Usuario</th>
-                  <th>Servicio</th>
-                  <th>Estado</th>
-                  <th>Pos.</th>
-                  <th>Fecha</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody id="turns-tbody">
-                <tr><td colspan="8"><div class="skeleton" style="height:40px;border-radius:4px;margin:8px 16px"></div></td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="panel-footer">
-            <div id="turns-pagination" class="pagination" style="padding:0"></div>
           </div>
         </div>
-      </div>
 
-      <div id="section-users" class="admin-section" style="display:none">
-        <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
-          <div>
-            <div class="page-title">Gestión de usuarios</div>
-            <div class="page-subtitle">Administra las cuentas de acceso al sistema.</div>
-          </div>
-          <button id="btn-new-user" class="btn btn-primary">+ Nuevo usuario</button>
-        </div>
-
-        <div class="panel">
-          <div class="panel-toolbar">
-            <div class="search-box">
-              <input type="search" class="form-control" id="admin-search-users" placeholder="Buscar nombre, correo, teléfono...">
-            </div>
-            <span id="users-total" class="panel-footer-info" style="margin-left:auto"></span>
-          </div>
-          <div class="users-table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nombre</th>
-                  <th>Correo</th>
-                  <th>Teléfono</th>
-                  <th>Rol</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody id="users-tbody">
-                <tr><td colspan="7"><div class="skeleton" style="height:40px;border-radius:4px;margin:8px 16px"></div></td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="panel-footer">
-            <div id="users-pagination" class="pagination" style="padding:0"></div>
+        <div class="sidebar-card">
+          <div class="sidebar-card-header">Información</div>
+          <div class="sidebar-card-body" style="font-size:.82rem;color:rgba(255,255,255,.4);line-height:1.8">
+            <div>📍 Calle Principal #10-20, Santa Juana</div>
+            <div style="margin-top:6px">📞 (601) 555-0100</div>
+            <div style="margin-top:6px">🕐 Lun–Vie: 7:00 a.m. — 5:00 p.m.</div>
           </div>
         </div>
       </div>
@@ -297,98 +243,27 @@ td.td-actions{width:1%;white-space:nowrap}
   </div>
 </div>
 
-<div class="modal-backdrop" id="modal-user">
+<div class="modal-backdrop modal-dark" id="modal-turn">
   <div class="modal">
     <div class="modal-header">
-      <h3 id="user-modal-title">Nuevo usuario</h3>
+      <h3>Solicitar turno</h3>
       <button class="modal-close" aria-label="Cerrar">✕</button>
     </div>
-    <form id="user-form" novalidate>
+    <form id="turn-form">
       <div class="modal-body">
         <div class="form-group">
-          <label class="form-label" for="u-name">Nombre completo</label>
-          <input class="form-control" type="text" id="u-name" name="name" placeholder="Nombre completo" required>
-          <span class="form-error" id="err-name"></span>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="u-email">Correo electrónico</label>
-          <input class="form-control" type="email" id="u-email" name="email" placeholder="correo@ejemplo.com" required>
-          <span class="form-error" id="err-email"></span>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="u-phone">Teléfono</label>
-          <input class="form-control" type="tel" id="u-phone" name="phone" placeholder="300 000 0000">
-        </div>
-        <div class="form-group" id="user-pass-field">
-          <label class="form-label" for="u-password">Contraseña</label>
-          <input class="form-control" type="password" id="u-password" name="password" placeholder="Mínimo 8 caracteres">
-          <span class="form-error" id="err-password"></span>
-        </div>
-        <div class="form-group" id="user-pass-change" style="display:none">
-          <label class="form-label" for="u-new-password">Nueva contraseña <span style="color:var(--gray-400);font-weight:400">(dejar vacío para no cambiar)</span></label>
-          <input class="form-control" type="password" id="u-new-password" name="new_password" placeholder="Nueva contraseña (opcional)">
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-          <div class="form-group" style="margin-bottom:0">
-            <label class="form-label" for="u-role">Rol</label>
-            <select class="form-control" id="u-role" name="role">
-              <option value="user">Usuario</option>
-              <option value="admin">Administrador</option>
-            </select>
-          </div>
-          <div class="form-group" style="margin-bottom:0">
-            <label class="form-label" for="u-active">Estado</label>
-            <select class="form-control" id="u-active" name="is_active">
-              <option value="1">Activo</option>
-              <option value="0">Inactivo</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-user')">Cancelar</button>
-        <button type="submit" class="btn btn-primary">Guardar</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<div class="modal-backdrop" id="modal-turn-admin">
-  <div class="modal">
-    <div class="modal-header">
-      <h3 id="turn-modal-title">Nuevo turno</h3>
-      <button class="modal-close" aria-label="Cerrar">✕</button>
-    </div>
-    <form id="turn-form-admin" novalidate>
-      <div class="modal-body">
-        <div class="form-group" id="turn-user-group">
-          <label class="form-label" for="turn-user-select">Usuario</label>
-          <select class="form-control" id="turn-user-select">
-            <option value="">— Seleccionar usuario —</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="turn-service-admin">Servicio</label>
-          <select class="form-control" id="turn-service-admin">
-          </select>
-        </div>
-        <div class="form-group" id="turn-status-group" style="display:none">
-          <label class="form-label" for="turn-status-admin">Estado</label>
-          <select class="form-control" id="turn-status-admin">
-            <option value="waiting">En espera</option>
-            <option value="active">Activo</option>
-            <option value="completed">Completado</option>
-            <option value="cancelled">Cancelado</option>
+          <label class="form-label" for="turn-service">Tipo de servicio</label>
+          <select class="form-control" id="turn-service" name="service">
           </select>
         </div>
         <div class="form-group" style="margin-bottom:0">
-          <label class="form-label" for="turn-notes-admin">Notas <span style="color:var(--gray-400);font-weight:400">(opcional)</span></label>
-          <textarea class="form-control" id="turn-notes-admin" placeholder="Notas adicionales..."></textarea>
+          <label class="form-label" for="turn-notes">Notas adicionales <span style="color:rgba(255,255,255,.3);font-weight:400">(opcional)</span></label>
+          <textarea class="form-control" id="turn-notes" name="notes" placeholder="Describe brevemente tu trámite..."></textarea>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-turn-admin')">Cancelar</button>
-        <button type="submit" class="btn btn-primary">Guardar</button>
+      <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,.06);padding:16px 24px">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-turn')">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Confirmar turno</button>
       </div>
     </form>
   </div>
@@ -396,51 +271,111 @@ td.td-actions{width:1%;white-space:nowrap}
 
 <script src="/assets/js/app.js"></script>
 <script>
-const sidebarToggle = document.getElementById('sidebar-toggle');
-if (sidebarToggle) {
-  if (window.innerWidth <= 768) sidebarToggle.style.display = 'flex';
-  window.addEventListener('resize', () => {
-    sidebarToggle.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
-  });
-}
+document.getElementById('today-date').textContent = new Date().toLocaleDateString('es-CO', { weekday:'short', day:'numeric', month:'short' });
 
-const sectionTitles = { dashboard: 'Panel general', turns: 'Gestión de turnos', users: 'Gestión de usuarios' };
-const _origShowSection = typeof showSection === 'function' ? showSection : null;
+document.getElementById('dismiss-notif')?.addEventListener('click', () => {
+  document.getElementById('notif-banner').classList.add('hidden');
+});
 
-function showSectionTitle(name) {
-  const el = document.getElementById('topbar-title');
-  if (el) el.textContent = sectionTitles[name] || name;
-}
+const _origRenderQueueData = typeof renderQueueData === 'function' ? renderQueueData : null;
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.sidebar-link[data-section]').forEach(link => {
-    link.addEventListener('click', () => showSectionTitle(link.dataset.section));
-  });
+function renderQueueData(data) {
+  if (!data || !data.success) return;
 
-  const adminInitialTop = document.getElementById('admin-initial-top');
-  const adminInitial = document.getElementById('admin-initial');
-  const mutObs = new MutationObserver(() => {
-    if (adminInitial && adminInitialTop) adminInitialTop.textContent = adminInitial.textContent;
-  });
-  if (adminInitial) mutObs.observe(adminInitial, { childList: true });
-
-  const turnStatusGroup = document.getElementById('turn-status-group');
-  const turnUserGroup = document.getElementById('turn-user-group');
-  const originalOpenTurnModal = typeof openTurnModal === 'function' ? openTurnModal : null;
-  if (originalOpenTurnModal) {
-    window._patchedTurnModal = true;
+  const ct = document.getElementById('current-turn-num');
+  if (ct) {
+    const val = data.current_turn;
+    ct.textContent = val ? String(val).padStart(3, '0') : '—';
+    ct.classList.toggle('no-turn', !val);
   }
 
-  const observer = new MutationObserver(() => {
-    const form = document.getElementById('turn-form-admin');
-    if (!form) return;
-    const isEdit = !!form.dataset.id;
-    if (turnStatusGroup) turnStatusGroup.style.display = isEdit ? '' : 'none';
-    if (turnUserGroup) turnUserGroup.style.display = isEdit ? 'none' : '';
-  });
-  const form = document.getElementById('turn-form-admin');
-  if (form) observer.observe(form, { attributes: true, attributeFilter: ['data-id'] });
-});
+  const svcEl = document.getElementById('active-service');
+  if (svcEl) svcEl.textContent = data.active_turn ? data.active_turn.service : 'Sin turno activo';
+
+  const wcEl = document.getElementById('waiting-count');
+  if (wcEl) wcEl.textContent = data.waiting_count ?? 0;
+
+  const sbWaiting = document.getElementById('sb-waiting');
+  if (sbWaiting) sbWaiting.textContent = data.waiting_count ?? 0;
+
+  const sbCurrent = document.getElementById('sb-current');
+  if (sbCurrent) sbCurrent.textContent = data.current_turn || '—';
+
+  const activeTurnDisplay = document.getElementById('active-turn-display');
+  if (activeTurnDisplay) {
+    if (data.active_turn) {
+      const t = data.active_turn;
+      activeTurnDisplay.innerHTML = `<div class="active-turn-card">
+        <div class="active-turn-num">#${t.turn_number}</div>
+        <div class="active-turn-info">
+          <div class="active-turn-label">En atención</div>
+          <div class="active-turn-service">${escHtml(t.service)}</div>
+          ${t.user_name ? `<div style="font-size:.75rem;color:rgba(255,255,255,.3);margin-top:2px">${escHtml(t.user_name)}</div>` : ''}
+        </div>
+        <div class="pulse-dot"></div>
+      </div>`;
+    } else {
+      activeTurnDisplay.innerHTML = '<div style="text-align:center;padding:12px 0;color:rgba(255,255,255,.25);font-size:.85rem">Sin turno activo</div>';
+    }
+  }
+
+  const isMine = data.my_turn;
+  const isBanner = document.getElementById('is-my-turn-banner');
+
+  if (isMine) {
+    const t = isMine;
+    const isActive = t.status === 'active';
+
+    document.getElementById('my-turn-section').style.display = 'block';
+    document.getElementById('no-turn-section').style.display = 'none';
+    document.getElementById('request-turn-btn').style.display = 'none';
+
+    if (isBanner) isBanner.style.display = isActive ? 'flex' : 'none';
+
+    const mtn = document.getElementById('my-turn-number');
+    if (mtn) mtn.textContent = '#' + String(t.turn_number).padStart(3, '0');
+
+    const mtsvc = document.getElementById('my-turn-service-tag');
+    if (mtsvc) mtsvc.textContent = t.service;
+
+    const mtService = document.getElementById('my-turn-service');
+    if (mtService) mtService.textContent = t.service;
+
+    const mtStatus = document.getElementById('my-turn-status-badge');
+    if (mtStatus) mtStatus.innerHTML = statusBadge(t.status);
+
+    const mtp = document.getElementById('my-turn-position');
+    if (mtp) mtp.textContent = isActive ? '¡Es tu turno!' : (t.position ? `${t.position}°` : '—');
+
+    const mtTime = document.getElementById('my-turn-time');
+    if (mtTime) mtTime.textContent = t.created_at ? formatDateShort(t.created_at) : '—';
+
+    const prog = document.getElementById('queue-progress');
+    const progPct = document.getElementById('prog-pct');
+    const progWrap = document.getElementById('prog-wrap');
+    if (prog && progWrap) {
+      if (!isActive && t.position) {
+        progWrap.style.display = 'block';
+        const total = Math.max(1, data.waiting_count || 1);
+        const pct = Math.max(5, Math.min(95, Math.round((1 - (t.position - 1) / total) * 100)));
+        prog.style.width = pct + '%';
+        if (progPct) progPct.textContent = pct + '%';
+      } else {
+        progWrap.style.display = isActive ? 'none' : 'block';
+        if (isActive && prog) prog.style.width = '100%';
+      }
+    }
+
+    const cancelBtn = document.getElementById('cancel-turn-btn');
+    if (cancelBtn) cancelBtn.dataset.id = t.id;
+
+  } else {
+    document.getElementById('my-turn-section').style.display = 'none';
+    document.getElementById('no-turn-section').style.display = 'block';
+    document.getElementById('request-turn-btn').style.display = '';
+    if (isBanner) isBanner.style.display = 'none';
+  }
+}
 </script>
 </body>
 </html>

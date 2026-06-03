@@ -1,7 +1,7 @@
 <?php
 define('APP_NAME', 'Secretaría Santa Juana');
 define('APP_VERSION', '1.0.0');
-define('APP_URL', 'http://localhost');
+define('APP_URL', 'https://turnos-sj.great-site.net');
 define('APP_ENV', 'production');
 define('SESSION_NAME', 'ssj_session');
 define('SESSION_LIFETIME', 7200);

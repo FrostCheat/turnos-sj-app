@@ -1,4 +1,4 @@
-const API = '/api/index.php';
+const API = '../../api/index.php';
 const STATE = { user: null, csrf: null, sseSource: null, sseRetries: 0 };
 
 async function api(action, opts = {}) {
@@ -10,7 +10,16 @@ async function api(action, opts = {}) {
   if (STATE.csrf && method !== 'GET') headers['X-CSRF-Token'] = STATE.csrf;
   try {
     const res = await fetch(url, { method, headers, credentials: 'include', body: body ? JSON.stringify(body) : undefined });
-    return await res.json();
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      console.error('API non-JSON response:', res.status, text.slice(0, 200));
+      if (res.status === 403) return { success: false, message: 'Acceso bloqueado por el servidor. Verifica la configuración del hosting.' };
+      if (res.status === 404) return { success: false, message: 'API no encontrada. Verifica que los archivos PHP estén publicados.' };
+      if (res.status >= 500) return { success: false, message: 'Error interno del servidor. Intenta de nuevo.' };
+      return { success: false, message: 'Respuesta inesperada del servidor.' };
+    }
   } catch (e) {
     return { success: false, message: 'Error de conexión. Verifica tu internet.' };
   }
@@ -84,7 +93,6 @@ function closeAllModals() {
   });
 }
 
-/* ===== ESC KEY / BACKDROP CLOSE ===== */
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllModals(); });
 document.addEventListener('click', e => {
   if (e.target.classList.contains('modal-backdrop')) closeAllModals();
@@ -217,9 +225,9 @@ function initLanding() {
 function initAuth() {
   loadCsrf();
 
-  const tabs    = document.querySelectorAll('.auth-tab');
-  const panels  = document.querySelectorAll('.auth-panel');
-  const hash    = location.hash;
+  const tabs   = document.querySelectorAll('.auth-tab');
+  const panels = document.querySelectorAll('.auth-panel');
+  const hash   = location.hash;
 
   function switchTab(tab) {
     tabs.forEach(t => t.classList.remove('active'));
@@ -268,9 +276,9 @@ function initAuth() {
       const res = await api('register', {
         method: 'POST',
         body: {
-          name: regForm.querySelector('[name="name"]').value,
-          email: regForm.querySelector('[name="email"]').value,
-          phone: regForm.querySelector('[name="phone"]')?.value,
+          name:     regForm.querySelector('[name="name"]').value,
+          email:    regForm.querySelector('[name="email"]').value,
+          phone:    regForm.querySelector('[name="phone"]')?.value,
           password: pass,
         },
       });
@@ -342,7 +350,6 @@ async function initHome() {
 
   function handleSSEData(data) {
     renderQueueData(data);
-
     if (data.my_turn) {
       const t = data.my_turn;
       if (prevMyTurnStatus !== t.status) {
@@ -350,9 +357,7 @@ async function initHome() {
           toast('¡Es tu turno! Pasa a la ventanilla.', 'success', 8000);
           sendNotification('¡Tu turno!', 'Es tu turno. Por favor acércate a la ventanilla.', { requireInteraction: true });
         }
-        if (t.status === 'cancelled') {
-          toast('Tu turno fue cancelado.', 'warning');
-        }
+        if (t.status === 'cancelled') toast('Tu turno fue cancelado.', 'warning');
         prevMyTurnStatus = t.status;
       }
       if (t.status === 'waiting' && t.position <= 2 && prevCurrentTurn !== data.current_turn) {
@@ -360,7 +365,6 @@ async function initHome() {
         sendNotification('¡Prepárate!', `Eres el número ${t.position} en la cola.`);
       }
     }
-
     prevCurrentTurn = data.current_turn;
   }
 
@@ -384,7 +388,6 @@ function renderQueueData(data) {
     const mt = data.my_turn;
     document.getElementById('my-turn-section')?.style.setProperty('display','block');
     document.getElementById('no-turn-section')?.style.setProperty('display','none');
-    document.getElementById('my-turn-number')?.childNodes.forEach(n => { if (n.nodeType === 3) n.nodeValue = ''; });
     const mtn = document.getElementById('my-turn-number');
     if (mtn) mtn.textContent = `#${mt.turn_number}`;
     const mts = document.getElementById('my-turn-status');
@@ -393,14 +396,12 @@ function renderQueueData(data) {
     if (mtsvc) mtsvc.textContent = mt.service;
     const mtp = document.getElementById('my-turn-position');
     if (mtp) mtp.textContent = mt.status === 'active' ? '¡Es tu turno!' : mt.position ? `Posición ${mt.position}` : '—';
-
     const prog = document.getElementById('queue-progress');
     if (prog && mt.status === 'waiting' && mt.position) {
       const total = (data.waiting_count || 1);
       const pct = Math.max(5, Math.min(95, Math.round((1 - (mt.position - 1) / total) * 100)));
       prog.style.width = pct + '%';
     }
-
     const cancelBtn = document.getElementById('cancel-turn-btn');
     if (cancelBtn) cancelBtn.dataset.id = mt.id;
     const reqBtn = document.getElementById('request-turn-btn');
@@ -531,7 +532,6 @@ function showSection(name) {
   const el = document.getElementById(`section-${name}`);
   if (el) el.style.display = 'block';
   document.querySelectorAll('.sidebar-link').forEach(l => l.classList.toggle('active', l.dataset.section === name));
-
   if (name === 'dashboard') loadDashboard();
   if (name === 'users') loadUsers();
   if (name === 'turns') loadTurns();
@@ -546,7 +546,6 @@ async function loadDashboard() {
   const res = await api('get_dashboard');
   if (!res.success) return;
   const s = res.stats;
-
   [
     ['stat-total-users', s.total_users],
     ['stat-total-turns', s.total_turns],
@@ -557,9 +556,7 @@ async function loadDashboard() {
     const el = document.getElementById(id);
     if (el) el.textContent = val ?? 0;
   });
-
   updateCurrentTurnDisplay(s.current_turn);
-
   const recentBody = document.getElementById('recent-turns-body');
   if (recentBody) {
     if (!res.recent_turns.length) {
@@ -575,7 +572,6 @@ async function loadDashboard() {
         </tr>`).join('');
     }
   }
-
   const svcBody = document.getElementById('service-stats-body');
   if (svcBody) {
     if (!res.by_service.length) {
@@ -596,16 +592,12 @@ async function loadUsers() {
   const tbody = document.getElementById('users-tbody');
   if (!tbody) return;
   tbody.innerHTML = '<tr><td colspan="7"><div class="skeleton" style="height:40px;border-radius:4px;margin:8px 16px"></div></td></tr>';
-
   const res = await api('get_users', { params: { search: ADMIN.usersSearch, page: ADMIN.usersPage, per_page: 20 } });
   if (!res.success) { tbody.innerHTML = `<tr><td colspan="7" class="empty-state"><p>${escHtml(res.message)}</p></td></tr>`; return; }
-
   ADMIN.usersTotal = res.total;
   ADMIN.usersPages = res.pages;
-
   const totalEl = document.getElementById('users-total');
   if (totalEl) totalEl.textContent = `${res.total} usuario${res.total !== 1 ? 's' : ''}`;
-
   if (!res.users.length) {
     tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">👥</div><p>Sin usuarios encontrados.</p></div></td></tr>';
   } else {
@@ -625,29 +617,25 @@ async function loadUsers() {
         </td>
       </tr>`).join('');
   }
-
   renderPagination('users-pagination', ADMIN.usersPage, ADMIN.usersPages, p => { ADMIN.usersPage = p; loadUsers(); });
 }
 
 async function loadTurns() {
   const tbody = document.getElementById('turns-tbody');
   if (!tbody) return;
-  tbody.innerHTML = '<tr><td colspan="7"><div class="skeleton" style="height:40px;border-radius:4px;margin:8px 16px"></div></td></tr>';
-
+  tbody.innerHTML = '<tr><td colspan="8"><div class="skeleton" style="height:40px;border-radius:4px;margin:8px 16px"></div></td></tr>';
   const res = await api('get_turns', { params: { search: ADMIN.turnsSearch, status: ADMIN.turnsStatus, page: ADMIN.turnsPage, per_page: 20 } });
-  if (!res.success) { tbody.innerHTML = `<tr><td colspan="7" class="empty-state"><p>${escHtml(res.message)}</p></td></tr>`; return; }
-
+  if (!res.success) { tbody.innerHTML = `<tr><td colspan="8" class="empty-state"><p>${escHtml(res.message)}</p></td></tr>`; return; }
   ADMIN.turnsTotal = res.total;
   ADMIN.turnsPages = res.pages;
-
   const totalEl = document.getElementById('turns-total');
   if (totalEl) totalEl.textContent = `${res.total} turno${res.total !== 1 ? 's' : ''}`;
-
   if (!res.turns.length) {
-    tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">🎫</div><p>Sin turnos encontrados.</p></div></td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="empty-state-icon">🎫</div><p>Sin turnos encontrados.</p></div></td></tr>';
   } else {
     tbody.innerHTML = res.turns.map(t => `
       <tr class="draggable-row" data-id="${t.id}" draggable="${t.status === 'waiting'}">
+        <td style="color:var(--gray-200);cursor:grab;font-size:1rem;text-align:center">⠿</td>
         <td><strong>#${t.turn_number}</strong></td>
         <td>${escHtml(t.user_name)}</td>
         <td>${escHtml(t.service)}</td>
@@ -664,10 +652,8 @@ async function loadTurns() {
           </div>
         </td>
       </tr>`).join('');
-
     initDragReorder();
   }
-
   renderPagination('turns-pagination', ADMIN.turnsPage, ADMIN.turnsPages, p => { ADMIN.turnsPage = p; loadTurns(); });
 }
 
@@ -693,15 +679,14 @@ async function openUserModal(id = null) {
   document.getElementById('user-pass-field').style.display = id ? 'none' : '';
   document.getElementById('user-pass-field').querySelector('input').required = !id;
   document.getElementById('user-pass-change').style.display = id ? '' : 'none';
-
   if (id) {
     const res = await api('get_user', { params: { id } });
     if (res.success) {
       const u = res.user;
-      form.querySelector('[name="name"]').value   = u.name;
-      form.querySelector('[name="email"]').value  = u.email;
-      form.querySelector('[name="phone"]').value  = u.phone ?? '';
-      form.querySelector('[name="role"]').value   = u.role;
+      form.querySelector('[name="name"]').value      = u.name;
+      form.querySelector('[name="email"]').value     = u.email;
+      form.querySelector('[name="phone"]').value     = u.phone ?? '';
+      form.querySelector('[name="role"]').value      = u.role;
       form.querySelector('[name="is_active"]').value = u.is_active;
     }
   }
@@ -723,14 +708,12 @@ async function handleUserFormSubmit(e) {
   if (!id) data.password = e.target.querySelector('[name="password"]').value;
   const newPass = e.target.querySelector('[name="new_password"]')?.value;
   if (newPass) data.password = newPass;
-
   setLoading(btn, true);
   const res = await api(id ? 'update_user' : 'create_user', {
     method: 'POST',
     body: id ? { ...data, id: +id } : data,
   });
   setLoading(btn, false);
-
   if (res.success) {
     toast(res.message, 'success');
     closeModal('modal-user');
@@ -750,9 +733,10 @@ async function deleteUser(id, name) {
 
 async function initAdminServices() {
   const services = (await api('get_services')).services ?? [];
-  ['turn-service-admin', 'user-service-filter'].forEach(selId => {
+  ['turn-service-admin'].forEach(selId => {
     const sel = document.getElementById(selId);
     if (!sel) return;
+    sel.innerHTML = '';
     services.forEach(s => { const o = document.createElement('option'); o.value = o.textContent = s; sel.appendChild(o); });
   });
 }
@@ -764,8 +748,11 @@ async function openTurnModal(id = null) {
   form.reset();
   form.dataset.id = id ?? '';
   document.getElementById('turn-modal-title').textContent = id ? 'Editar Turno' : 'Nuevo Turno';
-
+  const userGroup   = document.getElementById('turn-user-group');
+  const statusGroup = document.getElementById('turn-status-group');
   if (!id) {
+    if (userGroup)   userGroup.style.display   = '';
+    if (statusGroup) statusGroup.style.display = 'none';
     const usersRes = await api('get_users', { params: { per_page: 100 } });
     const sel = document.getElementById('turn-user-select');
     if (sel && usersRes.success) {
@@ -777,23 +764,17 @@ async function openTurnModal(id = null) {
         sel.appendChild(o);
       });
     }
-  }
-
-  if (id) {
+  } else {
+    if (userGroup)   userGroup.style.display   = 'none';
+    if (statusGroup) statusGroup.style.display = '';
     const res = await api('get_turn', { params: { id } });
     if (res.success) {
       const t = res.turn;
       document.getElementById('turn-service-admin').value = t.service;
-      document.getElementById('turn-notes-admin').value = t.notes ?? '';
-      document.getElementById('turn-status-admin').value = t.status;
-      const userSel = document.getElementById('turn-user-select');
-      if (userSel) { userSel.parentElement.style.display = 'none'; }
+      document.getElementById('turn-notes-admin').value   = t.notes ?? '';
+      document.getElementById('turn-status-admin').value  = t.status;
     }
-  } else {
-    const userSel = document.getElementById('turn-user-select');
-    if (userSel) { userSel.parentElement.style.display = ''; }
   }
-
   openModal('modal-turn-admin');
 }
 
@@ -813,11 +794,9 @@ async function handleTurnFormSubmit(e) {
     data.id     = +id;
     data.status = document.getElementById('turn-status-admin').value;
   }
-
   setLoading(btn, true);
   const res = await api(id ? 'update_turn' : 'create_turn', { method: 'POST', body: data });
   setLoading(btn, false);
-
   if (res.success) {
     toast(res.message, 'success');
     closeModal('modal-turn-admin');
@@ -879,9 +858,9 @@ function initDragReorder() {
       e.stopPropagation();
       if (ADMIN.dragSrcRow === row) return;
       const tbody = row.parentNode;
-      const rows = Array.from(tbody.querySelectorAll('.draggable-row'));
-      const fromIdx = rows.indexOf(ADMIN.dragSrcRow);
-      const toIdx   = rows.indexOf(row);
+      const allRows = Array.from(tbody.querySelectorAll('.draggable-row'));
+      const fromIdx = allRows.indexOf(ADMIN.dragSrcRow);
+      const toIdx   = allRows.indexOf(row);
       if (fromIdx < toIdx) row.parentNode.insertBefore(ADMIN.dragSrcRow, row.nextSibling);
       else row.parentNode.insertBefore(ADMIN.dragSrcRow, row);
       const ids = Array.from(tbody.querySelectorAll('.draggable-row')).map(r => +r.dataset.id);
@@ -889,11 +868,4 @@ function initDragReorder() {
       if (!res.success) toast(res.message, 'error');
     });
   });
-}
-
-/* ===== SETUP ADMIN ===== */
-async function setupAdminDB() {
-  try {
-    await fetch('/api/setup.php');
-  } catch {}
 }
