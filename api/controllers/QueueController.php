@@ -225,6 +225,7 @@ class QueueController {
         $this->db->prepare("UPDATE turns SET status = 'active', called_at = NOW(), position = NULL WHERE id = ?")->execute([$next['id']]);
         $this->db->prepare('UPDATE queue_state SET current_turn = ?, last_updated = NOW() WHERE id = 1')->execute([$next['turn_number']]);
         $this->recalcPositions();
+        $this->touchQueue();
         return ['success' => true, 'message' => 'Siguiente turno activado.', 'turn_number' => $next['turn_number']];
     }
 
@@ -275,12 +276,24 @@ class QueueController {
     public function advanceTurn(): array {
         AdminMiddleware::handle();
 
-        $state  = $this->db->query('SELECT current_turn FROM queue_state WHERE id = 1')->fetch();
-        $newVal = (int)($state['current_turn'] ?? 0) + 1;
+        // Use a transaction to prevent race conditions causing double increments
+        $this->db->beginTransaction();
+        try {
+            $state  = $this->db->query('SELECT current_turn FROM queue_state WHERE id = 1 FOR UPDATE')->fetch();
+            $current = (int)($state['current_turn'] ?? 0);
+            $newVal  = $current + 1;
 
-        if ($newVal > QUEUE_MAX_TURNS) return ['success' => false, 'message' => 'Límite máximo de turnos alcanzado.', 'current_turn' => (int)$state['current_turn']];
+            if ($newVal > QUEUE_MAX_TURNS) {
+                $this->db->rollBack();
+                return ['success' => false, 'message' => 'Límite máximo de turnos alcanzado.', 'current_turn' => $current];
+            }
 
-        $this->db->prepare('UPDATE queue_state SET current_turn = ?, last_updated = NOW() WHERE id = 1')->execute([$newVal]);
+            $this->db->prepare('UPDATE queue_state SET current_turn = ?, last_updated = NOW() WHERE id = 1')->execute([$newVal]);
+            $this->db->commit();
+        } catch (\Throwable $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
 
         return ['success' => true, 'message' => 'Turno avanzado.', 'current_turn' => $newVal];
     }
@@ -288,10 +301,18 @@ class QueueController {
     public function regressTurn(): array {
         AdminMiddleware::handle();
 
-        $state  = $this->db->query('SELECT current_turn FROM queue_state WHERE id = 1')->fetch();
-        $newVal = max(0, (int)($state['current_turn'] ?? 0) - 1);
+        // Use a transaction to prevent race conditions
+        $this->db->beginTransaction();
+        try {
+            $state  = $this->db->query('SELECT current_turn FROM queue_state WHERE id = 1 FOR UPDATE')->fetch();
+            $newVal = max(0, (int)($state['current_turn'] ?? 0) - 1);
 
-        $this->db->prepare('UPDATE queue_state SET current_turn = ?, last_updated = NOW() WHERE id = 1')->execute([$newVal]);
+            $this->db->prepare('UPDATE queue_state SET current_turn = ?, last_updated = NOW() WHERE id = 1')->execute([$newVal]);
+            $this->db->commit();
+        } catch (\Throwable $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
 
         return ['success' => true, 'message' => 'Turno retrocedido.', 'current_turn' => $newVal];
     }

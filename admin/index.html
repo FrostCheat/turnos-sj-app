@@ -101,6 +101,7 @@
 
     <div class="admin-content">
 
+      <!-- DASHBOARD -->
       <div id="section-dashboard" class="admin-section">
         <div class="page-header">
           <div class="page-title">Panel general</div>
@@ -150,6 +151,7 @@
         </div>
       </div>
 
+      <!-- TURNS -->
       <div id="section-turns" class="admin-section" style="display:none">
         <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
           <div><div class="page-title">Gestión de turnos</div><div class="page-subtitle">Administra y controla la cola de atención.</div></div>
@@ -177,6 +179,7 @@
         </div>
       </div>
 
+      <!-- USERS -->
       <div id="section-users" class="admin-section" style="display:none">
         <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
           <div><div class="page-title">Gestión de usuarios</div><div class="page-subtitle">Administra las cuentas de acceso al sistema.</div></div>
@@ -201,6 +204,7 @@
   </div>
 </div>
 
+<!-- MODAL: Usuario -->
 <div class="modal-backdrop" id="modal-user">
   <div class="modal">
     <div class="modal-header">
@@ -251,6 +255,7 @@
   </div>
 </div>
 
+<!-- MODAL: Turno -->
 <div class="modal-backdrop" id="modal-turn-admin">
   <div class="modal">
     <div class="modal-header">
@@ -309,6 +314,7 @@
     turnsPage:1, turnsSearch:'', turnsFilter:'', turnsPages:1,
     editingUserId:null, editingTurnId:null,
     services:[], dragSrc:null,
+    // Prevent concurrent turn button clicks
     btnLocked:false
   };
 
@@ -333,41 +339,40 @@
     setTimeout(()=>r.remove(), 380);
   }
 
+  // ── FIX: Single request per click, strict lock prevents double-fire ──────────
   async function callTurnApi(action, btn){
     if(ST.btnLocked) return;
     ST.btnLocked = true;
-    btn.disabled = true;
+
+    // Disable BOTH buttons to prevent any second click
+    const btnInc = $('btn-increase-turn');
+    const btnDec = $('btn-decrease-turn');
+    if(btnInc) btnInc.disabled = true;
+    if(btnDec) btnDec.disabled = true;
     ripple(btn);
 
     try {
-      const res = await fetch(
-        new URL('../../api/index.php?action='+action, location.origin).href,
-        {
-          method:'POST',
-          headers:{'Content-Type':'application/json','X-CSRF-Token':STATE?.csrf||''},
-          credentials:'include',
-          body:'{}'
-        }
-      );
-      const text = await res.text();
-      let data;
-      try { data = JSON.parse(text); } catch(e) {
-        if(typeof toast==='function') toast('Error del servidor ('+res.status+'). Verifica el hosting.','error');
-        return;
-      }
-      if(data.success){
+      // Use the global api() from app.js — no custom fetch to avoid double CSRF issues
+      const data = await api(action, { method: 'POST', body: {} });
+
+      if(data && data.success){
         setTurnDisplay(data.current_turn);
-        if(typeof toast==='function') toast('Turno '+pad3(data.current_turn),'success',1800);
+        if(typeof toast==='function') toast('Turno ' + pad3(data.current_turn), 'success', 1800);
+        // Refresh current section data only once
         if(ST.section==='dashboard') loadDashboard();
         if(ST.section==='turns')     loadTurns();
       } else {
-        if(typeof toast==='function') toast(data.message||'Error al cambiar turno','warning');
+        if(typeof toast==='function') toast((data&&data.message)||'Error al cambiar turno','warning');
       }
     } catch(e){
       if(typeof toast==='function') toast('Error de red: '+e.message,'error');
     } finally {
-      btn.disabled = false;
-      ST.btnLocked = false;
+      // Re-enable buttons after a short cooldown to further prevent rapid clicks
+      setTimeout(()=>{
+        if(btnInc) btnInc.disabled = false;
+        if(btnDec) btnDec.disabled = false;
+        ST.btnLocked = false;
+      }, 600);
     }
   }
 
@@ -417,15 +422,24 @@
     const tbody=$('users-tbody');
     if(!tbody) return;
     tbody.innerHTML=`<tr><td colspan="7"><div class="skel" style="height:40px;margin:8px 16px"></div></td></tr>`;
-    const res=await api('get_users',{params:{search:ST.usersSearch,page:ST.usersPage,per_page:20}});
+
+    const res = await api('get_users', {
+      params: {
+        search:   ST.usersSearch || '',
+        page:     String(ST.usersPage),
+        per_page: '20'
+      }
+    });
+
     if(!res||!res.success){
       tbody.innerHTML=`<tr><td colspan="7" class="empty-state"><p>${esc(res?.message||'Error al cargar usuarios')}</p></td></tr>`;
       return;
     }
-    ST.usersPages=res.pages;
+    ST.usersPages = res.pages || 1;
     const cnt=$('users-count');
     if(cnt) cnt.textContent=`${res.total} usuario${res.total!==1?'s':''}`;
-    if(!res.users.length){
+
+    if(!res.users || !res.users.length){
       tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">👥</div><p>Sin usuarios encontrados.</p></div></td></tr>';
     } else {
       tbody.innerHTML=res.users.map(u=>`
@@ -442,22 +456,32 @@
           </div></td>
         </tr>`).join('');
     }
-    renderPag('users-pagination',ST.usersPage,ST.usersPages,p=>{ST.usersPage=p;loadUsers();});
+    renderPag('users-pagination', ST.usersPage, ST.usersPages, p=>{ST.usersPage=p; loadUsers();});
   }
 
   async function loadTurns(){
     const tbody=$('turns-tbody');
     if(!tbody) return;
     tbody.innerHTML=`<tr><td colspan="8"><div class="skel" style="height:40px;margin:8px 16px"></div></td></tr>`;
-    const res=await api('get_turns',{params:{search:ST.turnsSearch,status:ST.turnsFilter,page:ST.turnsPage,per_page:20}});
+
+    const res = await api('get_turns', {
+      params: {
+        search:   ST.turnsSearch || '',
+        status:   ST.turnsFilter || '',
+        page:     String(ST.turnsPage),
+        per_page: '20'
+      }
+    });
+
     if(!res||!res.success){
       tbody.innerHTML=`<tr><td colspan="8" class="empty-state"><p>${esc(res?.message||'Error al cargar turnos')}</p></td></tr>`;
       return;
     }
-    ST.turnsPages=res.pages;
+    ST.turnsPages = res.pages || 1;
     const cnt=$('turns-count');
     if(cnt) cnt.textContent=`${res.total} turno${res.total!==1?'s':''}`;
-    if(!res.turns.length){
+
+    if(!res.turns || !res.turns.length){
       tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="empty-state-icon">🎫</div><p>Sin turnos encontrados.</p></div></td></tr>';
     } else {
       tbody.innerHTML=res.turns.map(t=>`
@@ -479,7 +503,7 @@
         </tr>`).join('');
       initDrag();
     }
-    renderPag('turns-pagination',ST.turnsPage,ST.turnsPages,p=>{ST.turnsPage=p;loadTurns();});
+    renderPag('turns-pagination', ST.turnsPage, ST.turnsPages, p=>{ST.turnsPage=p; loadTurns();});
   }
 
   function renderPag(id,cur,total,cb){
@@ -516,7 +540,7 @@
     if(id){ if(pg) pg.style.display='none'; if(pi) pi.required=false; if(pcg) pcg.style.display=''; }
     else   { if(pg) pg.style.display='';    if(pi) pi.required=true;  if(pcg) pcg.style.display='none'; }
     if(id){
-      const res=await api('get_user',{params:{id}});
+      const res=await api('get_user',{params:{id:String(id)}});
       if(res&&res.success){
         const u=res.user;
         $('u-name').value=u.name||''; $('u-email').value=u.email||'';
@@ -538,7 +562,7 @@
     const ug=$('ta-user-group'),sg=$('ta-status-group');
     if(!id){
       if(ug) ug.style.display=''; if(sg) sg.style.display='none';
-      const ur=await api('get_users',{params:{per_page:100}});
+      const ur=await api('get_users',{params:{per_page:'100'}});
       const sel=$('ta-user-select');
       if(sel&&ur?.success){
         sel.innerHTML='<option value="">— Seleccionar usuario —</option>';
@@ -546,7 +570,7 @@
       }
     } else {
       if(ug) ug.style.display='none'; if(sg) sg.style.display='';
-      const res=await api('get_turn',{params:{id}});
+      const res=await api('get_turn',{params:{id:String(id)}});
       if(res&&res.success){
         $('ta-service').value=res.turn.service;
         $('ta-notes').value=res.turn.notes||'';
@@ -576,7 +600,12 @@
   }
 
   async function init(){
-    if(typeof checkSession!=='function'){setTimeout(init,80);return;}
+    // Wait for app.js functions to be available
+    if(typeof checkSession!=='function'||typeof api!=='function'){
+      setTimeout(init,80);
+      return;
+    }
+
     const user=await checkSession();
     if(!user){location.href='/auth/';return;}
     if(user.role!=='admin'){location.href='/home/';return;}
@@ -586,48 +615,82 @@
     $('admin-initial').textContent=ini;
     $('admin-avatar-top').textContent=ini;
 
+    // Load CSRF token before anything else
     if(typeof loadCsrf==='function') await loadCsrf();
 
+    // Sidebar toggle
     const tog=$('sidebar-toggle'),sb=$('admin-sidebar'),ov=$('sidebar-overlay');
     const updTog=()=>{ if(tog) tog.style.display=window.innerWidth<=768?'flex':'none'; };
     updTog(); window.addEventListener('resize',updTog);
     tog?.addEventListener('click',()=>{sb.classList.toggle('open');ov.classList.toggle('open');});
     ov?.addEventListener('click',()=>{sb.classList.remove('open');ov.classList.remove('open');});
 
+    // Sidebar navigation
     document.querySelectorAll('.sidebar-link[data-section]').forEach(link=>{
       link.addEventListener('click',e=>{
-        e.preventDefault(); showSection(link.dataset.section);
+        e.preventDefault();
+        showSection(link.dataset.section);
         if(window.innerWidth<=768){sb.classList.remove('open');ov.classList.remove('open');}
       });
     });
 
+    // Logout
     $('logout-btn-admin')?.addEventListener('click',async()=>{
-      await api('logout',{method:'POST'}); location.href='/auth/';
+      await api('logout',{method:'POST'});
+      location.href='/auth/';
     });
 
-    $('btn-increase-turn')?.addEventListener('click',function(){ callTurnApi('increase_turn',this); });
-    $('btn-decrease-turn')?.addEventListener('click',function(){ callTurnApi('decrease_turn',this); });
+    // ── Turn control buttons — single listener each ──────────────────────────
+    $('btn-increase-turn')?.addEventListener('click',function(){
+      callTurnApi('increase_turn', this);
+    });
+    $('btn-decrease-turn')?.addEventListener('click',function(){
+      callTurnApi('decrease_turn', this);
+    });
 
-    $('admin-search-users')?.addEventListener('input',deb(e=>{ST.usersSearch=e.target.value;ST.usersPage=1;loadUsers();},350));
-    $('admin-search-turns')?.addEventListener('input',deb(e=>{ST.turnsSearch=e.target.value;ST.turnsPage=1;loadTurns();},350));
+    // Search inputs
+    $('admin-search-users')?.addEventListener('input',deb(e=>{
+      ST.usersSearch=e.target.value;
+      ST.usersPage=1;
+      loadUsers();
+    },350));
+    $('admin-search-turns')?.addEventListener('input',deb(e=>{
+      ST.turnsSearch=e.target.value;
+      ST.turnsPage=1;
+      loadTurns();
+    },350));
 
+    // Filter tabs
     document.querySelectorAll('.filter-tab[data-filter]').forEach(btn=>{
       btn.addEventListener('click',()=>{
         document.querySelectorAll('.filter-tab[data-filter]').forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active'); ST.turnsFilter=btn.dataset.filter; ST.turnsPage=1; loadTurns();
+        btn.classList.add('active');
+        ST.turnsFilter=btn.dataset.filter;
+        ST.turnsPage=1;
+        loadTurns();
       });
     });
 
+    // New user/turn buttons
     $('btn-new-user')?.addEventListener('click',()=>openUserModal(null));
     $('btn-new-turn')?.addEventListener('click',()=>openTurnModal(null));
+
+    // Modal cancel buttons
     $('user-form-cancel')?.addEventListener('click',()=>{if(typeof closeModal==='function') closeModal('modal-user');});
     $('turn-form-cancel')?.addEventListener('click',()=>{if(typeof closeModal==='function') closeModal('modal-turn-admin');});
 
+    // User form submit
     $('user-form')?.addEventListener('submit',async e=>{
       e.preventDefault();
       if(typeof clearFieldErrors==='function') clearFieldErrors(e.target);
       const btn=$('user-form-submit'), id=ST.editingUserId;
-      const data={name:$('u-name').value.trim(),email:$('u-email').value.trim(),phone:$('u-phone').value.trim(),role:$('u-role').value,is_active:+$('u-active').value};
+      const data={
+        name:     $('u-name').value.trim(),
+        email:    $('u-email').value.trim(),
+        phone:    $('u-phone').value.trim(),
+        role:     $('u-role').value,
+        is_active:+$('u-active').value
+      };
       if(!id) data.password=$('u-password').value;
       const np=$('u-new-password')?.value; if(np) data.password=np;
       if(id) data.id=+id;
@@ -644,6 +707,7 @@
       }
     });
 
+    // Turn form submit
     $('turn-form-admin')?.addEventListener('submit',async e=>{
       e.preventDefault();
       const btn=$('turn-form-submit'), id=ST.editingTurnId;
@@ -652,7 +716,10 @@
         const uid=$('ta-user-select').value;
         if(!uid){if(typeof toast==='function') toast('Selecciona un usuario.','error');return;}
         data.user_id=+uid;
-      } else { data.id=+id; data.status=$('ta-status').value; }
+      } else {
+        data.id=+id;
+        data.status=$('ta-status').value;
+      }
       if(typeof setLoading==='function') setLoading(btn,true);
       const res=await api(id?'update_turn':'create_turn',{method:'POST',body:data});
       if(typeof setLoading==='function') setLoading(btn,false);
@@ -666,10 +733,13 @@
       }
     });
 
+    // Turns table actions (event delegation)
     $('turns-tbody')?.addEventListener('click',async e=>{
       const btn=e.target.closest('[data-action]'); if(!btn) return;
       const act=btn.dataset.action, id=+btn.dataset.id;
+
       if(act==='edit-turn'){await openTurnModal(id);return;}
+
       if(act==='activate-turn'){
         const res=await api('update_turn',{method:'POST',body:{id,status:'active'}});
         if(typeof toast==='function') toast(res?.message||'Error',res?.success?'success':'error');
@@ -683,7 +753,9 @@
         return;
       }
       if(act==='cancel-turn'){
-        const ok=typeof confirm==='function'?await confirm('Cancelar turno','¿Cancelar este turno?','Sí, cancelar',true):window.confirm('¿Cancelar turno?');
+        const ok=typeof confirm==='function'
+          ? await confirm('Cancelar turno','¿Cancelar este turno?','Sí, cancelar',true)
+          : window.confirm('¿Cancelar turno?');
         if(!ok) return;
         const res=await api('cancel_turn',{method:'POST',body:{id}});
         if(typeof toast==='function') toast(res?.message||'Error',res?.success?'success':'error');
@@ -691,7 +763,9 @@
         return;
       }
       if(act==='del-turn'){
-        const ok=typeof confirm==='function'?await confirm('Eliminar turno','¿Eliminar este turno?','Eliminar',true):window.confirm('¿Eliminar turno?');
+        const ok=typeof confirm==='function'
+          ? await confirm('Eliminar turno','¿Eliminar este turno?','Eliminar',true)
+          : window.confirm('¿Eliminar turno?');
         if(!ok) return;
         const res=await api('delete_turn',{method:'POST',body:{id}});
         if(typeof toast==='function') toast(res?.message||'Error',res?.success?'success':'error');
@@ -700,34 +774,52 @@
       }
     });
 
+    // Users table actions (event delegation)
     $('users-tbody')?.addEventListener('click',async e=>{
       const btn=e.target.closest('[data-action]'); if(!btn) return;
       const act=btn.dataset.action, id=+btn.dataset.id;
+
       if(act==='edit-user'){await openUserModal(id);return;}
       if(act==='del-user'){
         const name=btn.dataset.name||'este usuario';
-        const ok=typeof confirm==='function'?await confirm('Eliminar usuario',`¿Eliminar a "${name}"?`,'Eliminar',true):window.confirm('¿Eliminar usuario?');
+        const ok=typeof confirm==='function'
+          ? await confirm('Eliminar usuario',`¿Eliminar a "${name}"?`,'Eliminar',true)
+          : window.confirm('¿Eliminar usuario?');
         if(!ok) return;
         const res=await api('delete_user',{method:'POST',body:{id}});
         if(typeof toast==='function') toast(res?.message||'Error',res?.success?'success':'error');
-        if(res?.success){await loadUsers();if(ST.section==='dashboard') await loadDashboard();}
+        if(res?.success){
+          await loadUsers();
+          if(ST.section==='dashboard') await loadDashboard();
+        }
         return;
       }
     });
 
+    // SSE for real-time updates
     if(typeof connectSSE==='function'){
       connectSSE(data=>{
         if(!data||data.type!=='queue_update') return;
-        if(data.current_turn!==undefined) setTurnDisplay(data.current_turn);
+        // Update turn display from SSE only if we're not mid-click (prevents visual jitter)
+        if(!ST.btnLocked && data.current_turn !== undefined){
+          setTurnDisplay(data.current_turn);
+        }
+        // Refresh tables for the current section
         if(ST.section==='dashboard') loadDashboard();
         if(ST.section==='turns')     loadTurns();
       });
     }
 
+    // Show initial section
     showSection('dashboard');
   }
 
-  document.readyState==='loading'?document.addEventListener('DOMContentLoaded',init):init();
+  // Start once DOM is ready
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
 })();
 </script>
 </body>
