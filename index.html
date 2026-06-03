@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Secretaría Santa Juana — Gestión de Turnos</title>
+<meta name="description" content="Sistema de gestión de turnos en tiempo real para la Secretaría Santa Juana.">
+<link rel="icon" type="image/png" href="/assets/imgs/fav_icon.png">
+<link rel="stylesheet" href="/assets/css/styles.css">
+</head>
+<body data-page="landing">
+<div id="toast-container"></div>
+
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <a href="/" class="navbar-brand">
+      <img src="/assets/imgs/icon.png" alt="Logo">
+      <span>Secretaría Santa Juana</span>
+    </a>
+    <nav class="navbar-nav">
+      <a href="#servicios" class="nav-link">Servicios</a>
+      <a href="#como-funciona" class="nav-link">¿Cómo funciona?</a>
+      <a href="#contacto" class="nav-link">Contacto</a>
+      <a href="/auth/" class="btn btn-primary btn-sm">Ingresar</a>
+    </nav>
+    <button class="navbar-menu-btn" id="mobile-menu" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<section class="hero" id="inicio">
+  <div class="hero-glow"></div>
+  <div class="container" style="width:100%;position:relative;z-index:1">
+    <div class="hero-content">
+      <div class="hero-eyebrow">Sistema de Turnos Digital</div>
+      <h1 class="hero-title">Tu tiempo es<br><span>valioso</span></h1>
+      <p class="hero-subtitle">Gestiona tu turno desde cualquier lugar. Recibe alertas en tiempo real y llega justo cuando te corresponde ser atendido.</p>
+      <div class="hero-cta">
+        <a href="/auth/#register" class="btn btn-primary btn-lg">Solicitar turno</a>
+        <a href="#como-funciona" class="btn btn-secondary btn-lg" style="border-color:rgba(255,255,255,.2);color:#fff;background:rgba(255,255,255,.06)">Cómo funciona</a>
+      </div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-badge">
+      <div class="hero-badge-number">042</div>
+      <div class="hero-badge-label">Turno actual</div>
+      <div style="margin-top:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <span class="badge badge-waiting">12 en espera</span>
+        <span class="badge badge-active">Atendiendo</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="servicios" style="background:var(--white)">
+  <div class="container">
+    <div class="section-label">Nuestros servicios</div>
+    <h2 class="section-title">Todo lo que necesitas<br>en un solo lugar</h2>
+    <p class="section-sub">Ofrecemos atención personalizada en múltiples áreas para satisfacer las necesidades de los ciudadanos.</p>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">📋</div>
+        <div class="service-title">Atención General</div>
+        <div class="service-desc">Consultas generales, información y orientación sobre todos los trámites disponibles.</div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">📄</div>
+        <div class="service-title">Trámites Documentales</div>
+        <div class="service-desc">Gestión de documentos oficiales, formularios y radicación de solicitudes formales.</div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🏆</div>
+        <div class="service-title">Certificados</div>
+        <div class="service-desc">Expedición de certificados de residencia, situación, antecedentes y más.</div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">💬</div>
+        <div class="service-title">Consultas</div>
+        <div class="service-desc">Asesoría especializada sobre trámites, derechos y obligaciones ciudadanas.</div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">💳</div>
+        <div class="service-title">Pagos y Recaudos</div>
+        <div class="service-desc">Cancelación de impuestos, tasas, multas y servicios municipales.</div>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🧭</div>
+        <div class="service-title">Orientación Ciudadana</div>
+        <div class="service-desc">Información sobre programas sociales, convocatorias y beneficios disponibles.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="como-funciona" style="background:var(--gray-50)">
+  <div class="container">
+    <div class="section-label">Proceso</div>
+    <h2 class="section-title">¿Cómo funciona?</h2>
+    <p class="section-sub">En cuatro pasos simples, gestiona tu turno de forma inteligente desde tu dispositivo.</p>
+    <div class="info-grid">
+      <div class="info-steps">
+        <div class="info-step">
+          <div class="step-num">1</div>
+          <div>
+            <div class="step-title">Regístrate o inicia sesión</div>
+            <div class="step-desc">Crea tu cuenta gratuita o ingresa con tus credenciales. Solo toma unos segundos.</div>
+          </div>
+        </div>
+        <div class="info-step">
+          <div class="step-num">2</div>
+          <div>
+            <div class="step-title">Solicita tu turno</div>
+            <div class="step-desc">Selecciona el tipo de servicio que necesitas y obtén un número de turno instantáneamente.</div>
+          </div>
+        </div>
+        <div class="info-step">
+          <div class="step-num">3</div>
+          <div>
+            <div class="step-title">Monitorea en tiempo real</div>
+            <div class="step-desc">Observa el avance de la cola desde cualquier lugar. Te avisamos cuando se acerque tu turno.</div>
+          </div>
+        </div>
+        <div class="info-step">
+          <div class="step-num">4</div>
+          <div>
+            <div class="step-title">Llega a tiempo</div>
+            <div class="step-desc">Recibe una notificación cuando sea tu turno. Llega justo cuando te corresponde.</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--black);border-radius:var(--radius-lg);padding:40px;text-align:center;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-20%;right:-10%;width:200px;height:200px;background:radial-gradient(circle,rgba(212,160,23,.2) 0%,transparent 70%);pointer-events:none"></div>
+        <div style="font-family:'Playfair Display',serif;font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.4);margin-bottom:8px">Turno actual</div>
+        <div style="font-family:'Playfair Display',serif;font-size:5rem;font-weight:700;color:var(--gold);line-height:1">037</div>
+        <div style="font-size:.85rem;color:rgba(255,255,255,.5);margin-top:8px;margin-bottom:24px">Atención General</div>
+        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(212,160,23,.2);border-radius:var(--radius-sm);padding:16px;margin-bottom:16px">
+          <div style="font-size:.75rem;color:rgba(255,255,255,.4);margin-bottom:4px">Tu turno</div>
+          <div style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--gold-light)">#041</div>
+          <div style="font-size:.8rem;color:rgba(255,255,255,.5);margin-top:4px">Posición 4 — aprox. 12 min</div>
+        </div>
+        <div style="height:4px;background:rgba(255,255,255,.08);border-radius:2px">
+          <div style="width:72%;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="contacto" style="background:var(--white)">
+  <div class="container">
+    <div class="section-label">Contacto</div>
+    <h2 class="section-title">¿Necesitas ayuda?</h2>
+    <p class="section-sub">Estamos disponibles para atenderte en los siguientes canales de comunicación.</p>
+    <div class="contact-grid">
+      <div class="contact-item">
+        <div class="contact-icon">📍</div>
+        <div>
+          <div class="contact-label">Dirección</div>
+          <div class="contact-value">Calle Principal #10-20, Santa Juana</div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">📞</div>
+        <div>
+          <div class="contact-label">Teléfono</div>
+          <div class="contact-value">(601) 555-0100</div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">✉️</div>
+        <div>
+          <div class="contact-label">Correo electrónico</div>
+          <div class="contact-value">contacto@santajuana.gov.co</div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">🕐</div>
+        <div>
+          <div class="contact-label">Horario de atención</div>
+          <div class="contact-value">Lunes a viernes: 7:00 a.m. — 5:00 p.m.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container footer-inner">
+    <div class="footer-brand">Secretaría Santa Juana</div>
+    <nav class="footer-links">
+      <a href="#">Política de privacidad</a>
+      <a href="#">Términos de uso</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <div class="footer-copy">© 2025 Secretaría Santa Juana. Todos los derechos reservados.</div>
+  </div>
+</footer>
+
+<script src="/assets/js/app.js"></script>
+</body>
+</html>

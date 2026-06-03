@@ -1,126 +1,143 @@
 <?php
-// ============================================================
-// CONTROLADOR DE AUTENTICACIÓN
-// ============================================================
-
 class AuthController {
-
     private PDO $db;
 
-    public function __construct() {
-        $this->db = Database::getInstance();
+    public function __construct(PDO $db) {
+        $this->db = $db;
     }
 
-    // ---- POST /login ----
-    public function login(array $params, array $body): void {
+    public function login(): array {
+        $body = json_decode(file_get_contents('php://input'), true) ?? [];
         $email    = trim($body['email'] ?? '');
         $password = $body['password'] ?? '';
 
-        // Validación básica
         if (!$email || !$password) {
-            $this->responder(400, ['error' => 'Email y contraseña son requeridos']);
-            return;
+            return ['success' => false, 'message' => 'Correo y contraseña son requeridos.'];
         }
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $this->responder(400, ['error' => 'Formato de email inválido']);
-            return;
+        if (!validateEmail($email)) {
+            return ['success' => false, 'message' => 'Formato de correo inválido.'];
         }
 
-        // Buscar usuario
-        $stmt = $this->db->prepare(
-            'SELECT id, nombre, email, password_hash, rol, activo, avatar_url FROM users WHERE email = ? LIMIT 1'
-        );
+        $attemptKey = 'login_attempts_' . md5($email);
+        $attempts   = $_SESSION[$attemptKey] ?? 0;
+        $lockUntil  = $_SESSION[$attemptKey . '_lock'] ?? 0;
+
+        if ($lockUntil > time()) {
+            $remaining = ceil(($lockUntil - time()) / 60);
+            return ['success' => false, 'message' => "Cuenta bloqueada. Intenta en $remaining minuto(s)."];
+        }
+
+        $stmt = $this->db->prepare('SELECT id, name, email, password, role, is_active FROM users WHERE email = ? LIMIT 1');
         $stmt->execute([$email]);
-        $usuario = $stmt->fetch();
+        $user = $stmt->fetch();
 
-        if (!$usuario || !password_verify($password, $usuario['password_hash'])) {
-            $this->responder(401, ['error' => 'Credenciales inválidas']);
-            return;
+        if (!$user || !password_verify($password, $user['password'])) {
+            $_SESSION[$attemptKey] = $attempts + 1;
+            if ($_SESSION[$attemptKey] >= MAX_LOGIN_ATTEMPTS) {
+                $_SESSION[$attemptKey . '_lock'] = time() + LOCKOUT_DURATION;
+                $_SESSION[$attemptKey] = 0;
+                return ['success' => false, 'message' => 'Demasiados intentos fallidos. Cuenta bloqueada temporalmente.'];
+            }
+            return ['success' => false, 'message' => 'Credenciales incorrectas.'];
         }
 
-        if (!$usuario['activo']) {
-            $this->responder(403, ['error' => 'Cuenta desactivada. Contacta al administrador.']);
-            return;
+        if (!$user['is_active']) {
+            return ['success' => false, 'message' => 'Tu cuenta está desactivada. Contacta al administrador.'];
         }
 
-        // Actualizar último login
-        $this->db->prepare('UPDATE users SET ultimo_login = NOW() WHERE id = ?')->execute([$usuario['id']]);
+        unset($_SESSION[$attemptKey], $_SESSION[$attemptKey . '_lock']);
+        session_regenerate_id(true);
 
-        // Generar JWT
-        $token = JWT::encode([
-            'sub'  => $usuario['id'],
-            'rol'  => $usuario['rol'],
-            'nombre' => $usuario['nombre'],
-        ]);
+        $_SESSION['user_id']   = $user['id'];
+        $_SESSION['user_role'] = $user['role'];
+        $_SESSION['user_name'] = $user['name'];
+        $_SESSION['user_email']= $user['email'];
 
-        unset($usuario['password_hash']);
-        $this->responder(200, [
-            'mensaje' => 'Login exitoso',
-            'token'   => $token,
-            'usuario' => $usuario,
-        ]);
+        if (password_needs_rehash($user['password'], PASSWORD_BCRYPT, ['cost' => BCRYPT_COST])) {
+            $newHash = password_hash($password, PASSWORD_BCRYPT, ['cost' => BCRYPT_COST]);
+            $u = $this->db->prepare('UPDATE users SET password = ? WHERE id = ?');
+            $u->execute([$newHash, $user['id']]);
+        }
+
+        return [
+            'success' => true,
+            'message' => 'Sesión iniciada correctamente.',
+            'user'    => ['id' => $user['id'], 'name' => $user['name'], 'role' => $user['role'], 'email' => $user['email']],
+        ];
     }
 
-    // ---- POST /register ----
-    public function register(array $params, array $body): void {
-        $nombre   = trim($body['nombre'] ?? '');
-        $email    = trim($body['email'] ?? '');
-        $password = $body['password'] ?? '';
+    public function register(): array {
+        $body  = json_decode(file_get_contents('php://input'), true) ?? [];
+        $name  = trim($body['name'] ?? '');
+        $email = trim($body['email'] ?? '');
+        $pass  = $body['password'] ?? '';
+        $phone = trim($body['phone'] ?? '');
 
-        // Validaciones
-        $errores = [];
-        if (strlen($nombre) < 2)  $errores[] = 'El nombre debe tener al menos 2 caracteres';
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errores[] = 'Email inválido';
-        if (strlen($password) < 8) $errores[] = 'La contraseña debe tener al menos 8 caracteres';
-        if (!preg_match('/[A-Z]/', $password)) $errores[] = 'La contraseña debe contener al menos una mayúscula';
-        if (!preg_match('/[0-9]/', $password)) $errores[] = 'La contraseña debe contener al menos un número';
-
-        if ($errores) {
-            $this->responder(422, ['error' => 'Validación fallida', 'detalles' => $errores]);
-            return;
+        if (!$name || !$email || !$pass) {
+            return ['success' => false, 'message' => 'Nombre, correo y contraseña son requeridos.'];
+        }
+        if (strlen($name) < 2 || strlen($name) > 120) {
+            return ['success' => false, 'message' => 'El nombre debe tener entre 2 y 120 caracteres.'];
+        }
+        if (!validateEmail($email)) {
+            return ['success' => false, 'message' => 'Formato de correo inválido.'];
+        }
+        if (!validatePassword($pass)) {
+            return ['success' => false, 'message' => 'La contraseña debe tener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial.'];
         }
 
-        // Verificar email único
-        $stmt = $this->db->prepare('SELECT id FROM users WHERE email = ? LIMIT 1');
-        $stmt->execute([$email]);
-        if ($stmt->fetch()) {
-            $this->responder(409, ['error' => 'El email ya está registrado']);
-            return;
+        $check = $this->db->prepare('SELECT id FROM users WHERE email = ? LIMIT 1');
+        $check->execute([$email]);
+        if ($check->fetch()) {
+            return ['success' => false, 'message' => 'Este correo ya está registrado.'];
         }
 
-        // Crear usuario
-        $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => BCRYPT_COST]);
-        $stmt = $this->db->prepare(
-            'INSERT INTO users (nombre, email, password_hash, rol) VALUES (?, ?, ?, "user")'
-        );
-        $stmt->execute([$nombre, $email, $hash]);
-        $nuevoId = (int) $this->db->lastInsertId();
+        $hash = password_hash($pass, PASSWORD_BCRYPT, ['cost' => BCRYPT_COST]);
+        $stmt = $this->db->prepare('INSERT INTO users (name, email, password, phone, role) VALUES (?, ?, ?, ?, \'user\')');
+        $stmt->execute([$name, $email, $hash, $phone ?: null]);
+        $userId = (int)$this->db->lastInsertId();
 
-        // Notificación de bienvenida
-        $this->db->prepare(
-            'INSERT INTO notifications (user_id, titulo, mensaje, tipo) VALUES (?, ?, ?, "exito")'
-        )->execute([$nuevoId, '¡Bienvenido a NovaSphere!', 'Tu cuenta ha sido creada exitosamente. ¡Explora el contenido!']);
+        session_regenerate_id(true);
+        $_SESSION['user_id']   = $userId;
+        $_SESSION['user_role'] = 'user';
+        $_SESSION['user_name'] = $name;
+        $_SESSION['user_email']= $email;
 
-        // Generar JWT
-        $token = JWT::encode(['sub' => $nuevoId, 'rol' => 'user', 'nombre' => $nombre]);
-
-        $this->responder(201, [
-            'mensaje' => 'Cuenta creada exitosamente',
-            'token'   => $token,
-            'usuario' => ['id' => $nuevoId, 'nombre' => $nombre, 'email' => $email, 'rol' => 'user'],
-        ]);
+        return [
+            'success' => true,
+            'message' => 'Cuenta creada correctamente.',
+            'user'    => ['id' => $userId, 'name' => $name, 'role' => 'user', 'email' => $email],
+        ];
     }
 
-    // ---- POST /logout ----
-    public function logout(array $params, array $body): void {
-        // Con JWT stateless, el logout se maneja en el frontend eliminando el token.
-        // Aquí podríamos agregar el token a una blacklist en BD si se requiere invalidación inmediata.
-        $this->responder(200, ['mensaje' => 'Sesión cerrada exitosamente']);
+    public function logout(): array {
+        $_SESSION = [];
+        if (ini_get('session.use_cookies')) {
+            $p = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000, $p['path'], $p['domain'], $p['secure'], $p['httponly']);
+        }
+        session_destroy();
+        return ['success' => true, 'message' => 'Sesión cerrada correctamente.'];
     }
 
-    private function responder(int $codigo, array $datos): void {
-        http_response_code($codigo);
-        echo json_encode($datos, JSON_UNESCAPED_UNICODE);
+    public function getSession(): array {
+        if (!AuthMiddleware::check()) {
+            return ['success' => false, 'authenticated' => false];
+        }
+        return [
+            'success'       => true,
+            'authenticated' => true,
+            'user'          => [
+                'id'    => (int)$_SESSION['user_id'],
+                'name'  => $_SESSION['user_name'],
+                'role'  => $_SESSION['user_role'],
+                'email' => $_SESSION['user_email'] ?? '',
+            ],
+        ];
+    }
+
+    public function getCsrfToken(): array {
+        return ['success' => true, 'token' => generateCsrfToken()];
     }
 }
