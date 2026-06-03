@@ -8,237 +8,235 @@
 <link rel="icon" type="image/png" href="/assets/imgs/fav_icon.png">
 <link rel="stylesheet" href="/assets/css/styles.css">
 <style>
-.home-nav{position:fixed;top:0;left:0;right:0;z-index:900;background:rgba(26,26,20,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.06)}
-.home-nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 24px;max-width:1100px;margin:0 auto}
-.home-nav-brand{display:flex;align-items:center;gap:10px;font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;color:var(--white)}
-.home-nav-brand img{width:32px;height:32px;border-radius:8px}
-.home-nav-right{display:flex;align-items:center;gap:12px}
-.home-nav-user{display:flex;align-items:center;gap:8px}
-.home-nav-user-name{font-size:.88rem;color:rgba(255,255,255,.7)}
-.home-body{padding-top:64px;min-height:100vh;background:var(--black)}
-.home-hero{background:linear-gradient(160deg,var(--black) 0%,#1c1c14 100%);padding:40px 0 32px;position:relative;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.05)}
-.home-hero::before{content:'';position:absolute;top:-30%;left:50%;transform:translateX(-50%);width:600px;height:400px;background:radial-gradient(ellipse,rgba(212,160,23,.1) 0%,transparent 70%);pointer-events:none}
-.hero-inner{max-width:1100px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
-.hero-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.4);margin-bottom:10px;font-weight:600}
-.hero-turn-number{font-family:'Playfair Display',serif;font-size:clamp(5rem,18vw,9rem);font-weight:700;color:var(--gold);line-height:1;text-shadow:0 0 80px rgba(212,160,23,.3)}
-.hero-turn-number.no-turn{color:rgba(255,255,255,.15);font-size:clamp(3rem,10vw,5rem)}
-.hero-service{font-size:.92rem;color:rgba(255,255,255,.45);margin-top:6px}
-.hero-meta{display:flex;align-items:center;gap:16px;margin-top:20px;flex-wrap:wrap}
-.hero-meta-item{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:var(--radius-sm);padding:8px 14px}
-.hero-meta-icon{font-size:1rem}
-.hero-meta-label{font-size:.72rem;color:rgba(255,255,255,.35);display:block}
-.hero-meta-value{font-size:.9rem;font-weight:600;color:rgba(255,255,255,.8);display:block}
-.home-main{max-width:1100px;margin:0 auto;padding:28px 24px 48px}
-.home-grid{display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start}
-.my-turn-panel{background:rgba(255,255,255,.03);border:1px solid rgba(212,160,23,.2);border-radius:var(--radius-lg);overflow:hidden}
-.my-turn-header{padding:20px 24px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between}
-.my-turn-header-title{font-size:.82rem;font-weight:600;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em}
-.my-turn-body{padding:28px 24px}
-.my-turn-number-big{font-family:'Playfair Display',serif;font-size:4.5rem;font-weight:700;color:var(--gold-light);line-height:1}
-.my-turn-service-tag{display:inline-block;background:rgba(212,160,23,.12);border:1px solid rgba(212,160,23,.2);border-radius:20px;padding:4px 12px;font-size:.78rem;color:var(--gold);margin-top:8px;margin-bottom:20px}
-.my-turn-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)}
-.my-turn-row:last-of-type{border-bottom:none}
-.my-turn-row-label{font-size:.8rem;color:rgba(255,255,255,.35)}
-.my-turn-row-value{font-size:.88rem;font-weight:600;color:rgba(255,255,255,.75)}
-.prog-wrap{margin-top:16px}
-.prog-label{display:flex;justify-content:space-between;font-size:.75rem;color:rgba(255,255,255,.35);margin-bottom:6px}
-.prog-track{height:6px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}
-.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:3px;transition:width .8s cubic-bezier(.4,0,.2,1)}
-.no-turn-panel{background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.08);border-radius:var(--radius-lg);padding:40px 24px;text-align:center}
-.no-turn-icon{font-size:2.8rem;margin-bottom:12px}
-.no-turn-title{font-size:1.1rem;font-weight:600;color:rgba(255,255,255,.6);margin-bottom:8px}
-.no-turn-desc{font-size:.85rem;color:rgba(255,255,255,.3);margin-bottom:24px}
-.sidebar-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
-.sidebar-card-header{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.05);font-size:.78rem;font-weight:600;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;justify-content:space-between}
-.sidebar-card-body{padding:16px 18px}
-.queue-stat{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)}
-.queue-stat:last-child{border-bottom:none}
-.queue-stat-label{font-size:.82rem;color:rgba(255,255,255,.4);display:flex;align-items:center;gap:8px}
-.queue-stat-value{font-size:1rem;font-weight:700;color:rgba(255,255,255,.8);font-family:'Playfair Display',serif}
-.service-list{display:flex;flex-direction:column;gap:6px}
-.service-chip{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius-sm);padding:10px 14px;font-size:.83rem;color:rgba(255,255,255,.55);cursor:pointer;transition:var(--transition)}
-.service-chip:hover{border-color:rgba(212,160,23,.3);color:var(--gold)}
-.service-chip.selected{border-color:var(--gold);background:rgba(212,160,23,.08);color:var(--gold)}
-.active-turn-card{background:linear-gradient(135deg,rgba(30,126,52,.15) 0%,rgba(30,126,52,.06) 100%);border:1px solid rgba(30,126,52,.25);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;gap:12px}
-.active-turn-num{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:#4caf7a;line-height:1}
-.active-turn-info{flex:1}
-.active-turn-label{font-size:.72rem;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.08em}
-.active-turn-service{font-size:.85rem;color:rgba(255,255,255,.65);margin-top:2px}
-.pulse-dot{width:8px;height:8px;border-radius:50%;background:#4caf7a;animation:pulse 2s infinite;flex-shrink:0}
-.is-my-turn-banner{background:linear-gradient(135deg,rgba(212,160,23,.2) 0%,rgba(245,200,66,.1) 100%);border:1px solid rgba(212,160,23,.4);border-radius:var(--radius-sm);padding:16px 20px;display:flex;align-items:center;gap:14px;margin-bottom:20px;animation:pulse 2s infinite}
-.is-my-turn-icon{font-size:1.8rem;flex-shrink:0}
-.is-my-turn-text strong{display:block;color:var(--gold-light);font-size:.95rem;margin-bottom:2px}
-.is-my-turn-text span{font-size:.82rem;color:rgba(255,255,255,.5)}
-.modal-dark .modal{background:var(--gray-800);color:var(--white)}
-.modal-dark .modal-header h3{color:var(--white)}
-.modal-dark .form-label{color:rgba(255,255,255,.6)}
-.modal-dark .form-control{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.12);color:var(--white)}
+*,*::before,*::after{box-sizing:border-box}
+.h-nav{position:fixed;top:0;left:0;right:0;z-index:900;background:rgba(26,26,20,.95);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.06)}
+.h-nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 24px;max-width:1120px;margin:0 auto;gap:12px}
+.h-brand{display:flex;align-items:center;gap:10px;font-family:'Playfair Display',serif;font-weight:700;font-size:1rem;color:#fff;white-space:nowrap}
+.h-brand img{width:32px;height:32px;border-radius:8px;flex-shrink:0}
+.h-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.h-uname{font-size:.85rem;color:rgba(255,255,255,.65)}
+.h-avatar{width:32px;height:32px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;color:var(--black);flex-shrink:0}
+.h-body{padding-top:64px;min-height:100vh;background:var(--black)}
+.h-hero{background:linear-gradient(160deg,#1a1a14 0%,#1c1c10 100%);padding:36px 0 28px;position:relative;overflow:hidden;border-bottom:1px solid rgba(255,255,255,.05)}
+.h-hero::before{content:'';position:absolute;top:-40%;left:50%;transform:translateX(-50%);width:700px;height:500px;background:radial-gradient(ellipse,rgba(212,160,23,.09) 0%,transparent 65%);pointer-events:none}
+.hero-wrap{max-width:1120px;margin:0 auto;padding:0 24px;position:relative;z-index:1}
+.hero-lbl{font-size:.7rem;text-transform:uppercase;letter-spacing:.15em;color:rgba(255,255,255,.35);margin-bottom:10px;font-weight:600}
+.hero-num{font-family:'Playfair Display',serif;font-size:clamp(4.5rem,16vw,8rem);font-weight:700;color:var(--gold);line-height:1;text-shadow:0 0 80px rgba(212,160,23,.25);transition:color .3s}
+.hero-num.empty{color:rgba(255,255,255,.1)}
+.hero-svc{font-size:.9rem;color:rgba(255,255,255,.4);margin-top:6px;min-height:1.4em}
+.hero-pills{display:flex;align-items:center;gap:12px;margin-top:20px;flex-wrap:wrap}
+.hero-pill{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:8px 14px}
+.hp-lbl{font-size:.68rem;color:rgba(255,255,255,.3);display:block;text-transform:uppercase;letter-spacing:.06em}
+.hp-val{font-size:.88rem;font-weight:600;color:rgba(255,255,255,.75);display:block}
+.h-main{max-width:1120px;margin:0 auto;padding:28px 24px 56px}
+.h-grid{display:grid;grid-template-columns:1fr 320px;gap:22px;align-items:start}
+@media(max-width:900px){.h-grid{grid-template-columns:1fr}}
+@media(max-width:480px){.h-uname{display:none}.hero-pills{gap:8px}}
+.turn-panel{background:rgba(255,255,255,.025);border:1px solid rgba(212,160,23,.18);border-radius:20px;overflow:hidden}
+.turn-panel-head{padding:18px 22px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.turn-panel-title{font-size:.75rem;font-weight:600;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.1em}
+.turn-panel-body{padding:26px 22px}
+.turn-big-num{font-family:'Playfair Display',serif;font-size:4rem;font-weight:700;color:var(--gold-light);line-height:1}
+.turn-svc-tag{display:inline-block;background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.2);border-radius:20px;padding:4px 12px;font-size:.75rem;color:var(--gold);margin-top:8px;margin-bottom:18px}
+.turn-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.turn-row:last-of-type{border-bottom:none}
+.turn-row-lbl{font-size:.78rem;color:rgba(255,255,255,.3)}
+.turn-row-val{font-size:.85rem;font-weight:600;color:rgba(255,255,255,.7)}
+.prog-wrap{margin-top:14px}
+.prog-hd{display:flex;justify-content:space-between;font-size:.72rem;color:rgba(255,255,255,.3);margin-bottom:5px}
+.prog-track{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:3px;transition:width .9s cubic-bezier(.4,0,.2,1)}
+.no-turn-wrap{background:rgba(255,255,255,.025);border:1px dashed rgba(255,255,255,.07);border-radius:20px;padding:48px 24px;text-align:center}
+.no-turn-ico{font-size:2.6rem;margin-bottom:12px}
+.no-turn-ttl{font-size:1rem;font-weight:600;color:rgba(255,255,255,.55);margin-bottom:8px}
+.no-turn-sub{font-size:.83rem;color:rgba(255,255,255,.25);margin-bottom:24px;max-width:280px;margin-left:auto;margin-right:auto}
+.my-turn-alert{background:linear-gradient(135deg,rgba(212,160,23,.18) 0%,rgba(245,200,66,.08) 100%);border:1px solid rgba(212,160,23,.35);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.mta-ico{font-size:1.6rem;flex-shrink:0}
+.mta-txt strong{display:block;color:var(--gold-light);font-size:.92rem;margin-bottom:2px}
+.mta-txt span{font-size:.8rem;color:rgba(255,255,255,.45)}
+.s-card{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.s-card-head{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.04);font-size:.72rem;font-weight:600;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.09em;display:flex;align-items:center;justify-content:space-between}
+.s-card-body{padding:14px 16px}
+.q-stat{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.q-stat:last-child{border-bottom:none}
+.q-stat-lbl{font-size:.8rem;color:rgba(255,255,255,.35);display:flex;align-items:center;gap:7px}
+.q-stat-val{font-size:.95rem;font-weight:700;color:rgba(255,255,255,.75);font-family:'Playfair Display',serif}
+.pulse-dot{width:7px;height:7px;border-radius:50%;background:#4caf7a;animation:h-pulse 2s infinite;flex-shrink:0}
+@keyframes h-pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.act-card{background:linear-gradient(135deg,rgba(30,126,52,.12) 0%,rgba(30,126,52,.05) 100%);border:1px solid rgba(30,126,52,.2);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px}
+.act-num{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:#4caf7a;line-height:1}
+.act-info{flex:1}
+.act-lbl{font-size:.68rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.07em}
+.act-svc{font-size:.82rem;color:rgba(255,255,255,.6);margin-top:2px}
+.notif-bar{background:var(--gold-pale);border:1px solid var(--gold-light);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:20px;font-size:.85rem}
+.notif-bar.hidden{display:none}
+.modal-dark .modal{background:#1e1e18;color:#fff}
+.modal-dark .modal-header h3{color:#fff}
+.modal-dark .form-label{color:rgba(255,255,255,.55)}
+.modal-dark .form-control{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.12);color:#fff}
 .modal-dark .form-control:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,160,23,.15)}
-.modal-dark .form-control::placeholder{color:rgba(255,255,255,.25)}
-.modal-dark select.form-control option{background:var(--gray-800);color:var(--white)}
+.modal-dark .form-control::placeholder{color:rgba(255,255,255,.2)}
+.modal-dark select.form-control option{background:#1e1e18;color:#fff}
 .modal-dark .modal-close{color:rgba(255,255,255,.4)}
-.modal-dark .modal-close:hover{background:rgba(255,255,255,.08);color:var(--white)}
-@media(max-width:900px){.home-grid{grid-template-columns:1fr}}
-@media(max-width:480px){.home-nav-user-name{display:none}.hero-meta{gap:8px}}
+.modal-dark .modal-close:hover{background:rgba(255,255,255,.08);color:#fff}
+.modal-dark .modal-footer{border-top:1px solid rgba(255,255,255,.07);padding:14px 22px}
+.btn-cancel-turn{background:rgba(192,57,43,.15);color:#e57373;border:1px solid rgba(192,57,43,.3);border-radius:8px;padding:8px 18px;font-size:.85rem;font-weight:500;cursor:pointer;transition:.2s;width:100%;justify-content:center;display:flex;align-items:center;gap:6px}
+.btn-cancel-turn:hover{background:rgba(192,57,43,.25);color:#ef9a9a}
+.skel{background:linear-gradient(90deg,rgba(255,255,255,.05) 25%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.05) 75%);background-size:400px 100%;animation:sk 1.5s infinite;border-radius:6px}
+@keyframes sk{from{background-position:-200px 0}to{background-position:200px 0}}
 </style>
 </head>
 <body data-page="home">
 <div id="toast-container"></div>
 
-<nav class="home-nav">
-  <div class="home-nav-inner">
-    <div class="home-nav-brand">
+<nav class="h-nav">
+  <div class="h-nav-inner">
+    <div class="h-brand">
       <img src="/assets/imgs/icon.png" alt="Logo">
       <span>Secretaría Santa Juana</span>
     </div>
-    <div class="home-nav-right">
+    <div class="h-right">
       <span id="conn-status" class="conn-badge disconnected">● Conectando</span>
-      <div class="home-nav-user">
-        <div class="avatar" id="user-initial" style="width:32px;height:32px;font-size:.78rem">?</div>
-        <span class="home-nav-user-name" id="user-name">Cargando...</span>
-      </div>
-      <button id="logout-btn" class="btn btn-ghost btn-sm" style="color:rgba(255,255,255,.45);padding:6px 10px">Salir</button>
+      <div class="h-avatar" id="user-initial">?</div>
+      <span class="h-uname" id="user-name">Cargando…</span>
+      <button id="logout-btn" class="btn btn-ghost btn-sm" style="color:rgba(255,255,255,.4);padding:6px 10px">Salir</button>
     </div>
   </div>
 </nav>
 
-<div class="home-body">
-
-  <div class="home-hero">
-    <div class="hero-inner">
-      <div class="hero-label">Turno siendo atendido</div>
-      <div id="current-turn-num" class="hero-turn-number no-turn">—</div>
-      <div id="active-service" class="hero-service">Sin turno activo</div>
-      <div class="hero-meta">
-        <div class="hero-meta-item">
-          <span class="hero-meta-icon">🕐</span>
+<div class="h-body">
+  <div class="h-hero">
+    <div class="hero-wrap">
+      <div class="hero-lbl">Turno siendo atendido ahora</div>
+      <div id="h-current-num" class="hero-num empty">—</div>
+      <div id="h-active-svc" class="hero-svc">Sin turno activo</div>
+      <div class="hero-pills">
+        <div class="hero-pill">
+          <span style="font-size:1rem">🕐</span>
           <span>
-            <span class="hero-meta-label">En espera</span>
-            <span class="hero-meta-value" id="waiting-count">0</span>
+            <span class="hp-lbl">En espera</span>
+            <span class="hp-val" id="h-waiting-count">0</span>
           </span>
         </div>
-        <div class="hero-meta-item">
-          <span class="hero-meta-icon">📅</span>
+        <div class="hero-pill">
+          <span style="font-size:1rem">📅</span>
           <span>
-            <span class="hero-meta-label">Fecha</span>
-            <span class="hero-meta-value" id="today-date"></span>
+            <span class="hp-lbl">Fecha</span>
+            <span class="hp-val" id="h-today-date"></span>
           </span>
         </div>
-        <div class="hero-meta-item">
-          <span class="hero-meta-icon">⏰</span>
+        <div class="hero-pill">
+          <span style="font-size:1rem">⏰</span>
           <span>
-            <span class="hero-meta-label">Horario</span>
-            <span class="hero-meta-value">7:00 — 17:00</span>
+            <span class="hp-lbl">Horario</span>
+            <span class="hp-val">7:00 — 17:00</span>
           </span>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="home-main">
-
-    <div id="notif-banner" class="notif-banner hidden">
+  <div class="h-main">
+    <div id="notif-bar" class="notif-bar hidden">
       <span>🔔</span>
-      <span style="flex:1;color:var(--gray-700)">Activa las notificaciones para recibir alertas cuando sea tu turno.</span>
-      <button id="enable-notif" class="btn btn-primary btn-sm">Activar</button>
-      <button id="dismiss-notif" class="btn btn-ghost btn-sm" style="color:var(--gray-400)">✕</button>
+      <span style="flex:1;color:var(--gray-700)">Activa las notificaciones para saber cuándo es tu turno.</span>
+      <button id="btn-enable-notif" class="btn btn-primary btn-sm">Activar</button>
+      <button id="btn-dismiss-notif" class="btn btn-ghost btn-sm" style="color:var(--gray-400)">✕</button>
     </div>
 
-    <div class="home-grid">
-
+    <div class="h-grid">
       <div>
-        <div id="is-my-turn-banner" class="is-my-turn-banner" style="display:none">
-          <div class="is-my-turn-icon">🔔</div>
-          <div class="is-my-turn-text">
+        <div id="my-turn-alert" class="my-turn-alert" style="display:none">
+          <div class="mta-ico">🔔</div>
+          <div class="mta-txt">
             <strong>¡Es tu turno ahora!</strong>
             <span>Por favor acércate a la ventanilla de atención.</span>
           </div>
         </div>
 
         <div id="my-turn-section" style="display:none">
-          <div class="my-turn-panel">
-            <div class="my-turn-header">
-              <span class="my-turn-header-title">Mi turno</span>
-              <span id="my-turn-status-badge"></span>
+          <div class="turn-panel">
+            <div class="turn-panel-head">
+              <span class="turn-panel-title">Mi turno</span>
+              <span id="my-turn-badge"></span>
             </div>
-            <div class="my-turn-body">
-              <div class="my-turn-number-big" id="my-turn-number">—</div>
-              <div id="my-turn-service-tag" class="my-turn-service-tag"></div>
-              <div class="my-turn-row">
-                <span class="my-turn-row-label">Posición en cola</span>
-                <span class="my-turn-row-value" id="my-turn-position">—</span>
+            <div class="turn-panel-body">
+              <div class="turn-big-num" id="my-turn-number">—</div>
+              <div id="my-turn-svc-tag" class="turn-svc-tag"></div>
+              <div class="turn-row">
+                <span class="turn-row-lbl">Posición en cola</span>
+                <span class="turn-row-val" id="my-turn-pos">—</span>
               </div>
-              <div class="my-turn-row">
-                <span class="my-turn-row-label">Servicio</span>
-                <span class="my-turn-row-value" id="my-turn-service">—</span>
+              <div class="turn-row">
+                <span class="turn-row-lbl">Servicio</span>
+                <span class="turn-row-val" id="my-turn-svc">—</span>
               </div>
-              <div class="my-turn-row">
-                <span class="my-turn-row-label">Hora de solicitud</span>
-                <span class="my-turn-row-value" id="my-turn-time">—</span>
+              <div class="turn-row">
+                <span class="turn-row-lbl">Hora de solicitud</span>
+                <span class="turn-row-val" id="my-turn-time">—</span>
               </div>
-              <div class="prog-wrap" id="prog-wrap">
-                <div class="prog-label">
+              <div id="prog-wrap" class="prog-wrap" style="display:none">
+                <div class="prog-hd">
                   <span>Progreso en cola</span>
                   <span id="prog-pct">0%</span>
                 </div>
                 <div class="prog-track">
-                  <div class="prog-fill" id="queue-progress" style="width:0%"></div>
+                  <div class="prog-fill" id="prog-fill" style="width:5%"></div>
                 </div>
               </div>
-              <div style="display:flex;gap:8px;margin-top:20px">
-                <button id="cancel-turn-btn" class="btn btn-danger btn-sm" style="flex:1;justify-content:center">Cancelar turno</button>
+              <div style="margin-top:20px">
+                <button id="cancel-turn-btn" class="btn-cancel-turn">Cancelar turno</button>
               </div>
             </div>
           </div>
         </div>
 
         <div id="no-turn-section">
-          <div class="no-turn-panel">
-            <div class="no-turn-icon">🎫</div>
-            <div class="no-turn-title">No tienes un turno activo</div>
-            <div class="no-turn-desc">Solicita un turno para ser atendido. Te notificaremos cuando sea tu momento.</div>
+          <div class="no-turn-wrap">
+            <div class="no-turn-ico">🎫</div>
+            <div class="no-turn-ttl">No tienes un turno activo</div>
+            <div class="no-turn-sub">Solicita un turno para ser atendido. Te notificaremos cuando sea tu momento.</div>
             <button id="request-turn-btn" class="btn btn-primary btn-lg" style="margin:0 auto">Solicitar turno</button>
           </div>
         </div>
       </div>
 
       <div>
-        <div class="sidebar-card">
-          <div class="sidebar-card-header">
+        <div class="s-card">
+          <div class="s-card-head">
             Turno activo
             <div class="pulse-dot"></div>
           </div>
-          <div class="sidebar-card-body">
+          <div class="s-card-body">
             <div id="active-turn-display">
-              <div style="text-align:center;padding:12px 0;color:rgba(255,255,255,.25);font-size:.85rem">Sin turno activo</div>
+              <div style="text-align:center;padding:10px 0;color:rgba(255,255,255,.2);font-size:.82rem">Sin turno activo</div>
             </div>
           </div>
         </div>
 
-        <div class="sidebar-card">
-          <div class="sidebar-card-header">Estado de la cola</div>
-          <div class="sidebar-card-body">
-            <div class="queue-stat">
-              <span class="queue-stat-label">🕐 En espera</span>
-              <span class="queue-stat-value" id="sb-waiting">0</span>
+        <div class="s-card">
+          <div class="s-card-head">Estado de la cola</div>
+          <div class="s-card-body">
+            <div class="q-stat">
+              <span class="q-stat-lbl">🕐 En espera</span>
+              <span class="q-stat-val" id="sb-waiting">0</span>
             </div>
-            <div class="queue-stat">
-              <span class="queue-stat-label">✅ Atendido hoy</span>
-              <span class="queue-stat-value" id="sb-current">—</span>
+            <div class="q-stat">
+              <span class="q-stat-lbl">✅ Número atendido</span>
+              <span class="q-stat-val" id="sb-current">—</span>
             </div>
           </div>
         </div>
 
-        <div class="sidebar-card">
-          <div class="sidebar-card-header">Información</div>
-          <div class="sidebar-card-body" style="font-size:.82rem;color:rgba(255,255,255,.4);line-height:1.8">
+        <div class="s-card">
+          <div class="s-card-head">Información</div>
+          <div class="s-card-body" style="font-size:.8rem;color:rgba(255,255,255,.35);line-height:1.9">
             <div>📍 Calle Principal #10-20, Santa Juana</div>
-            <div style="margin-top:6px">📞 (601) 555-0100</div>
-            <div style="margin-top:6px">🕐 Lun–Vie: 7:00 a.m. — 5:00 p.m.</div>
+            <div>📞 (601) 555-0100</div>
+            <div>🕐 Lun–Vie: 7:00 a.m. — 5:00 p.m.</div>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </div>
@@ -249,21 +247,20 @@
       <h3>Solicitar turno</h3>
       <button class="modal-close" aria-label="Cerrar">✕</button>
     </div>
-    <form id="turn-form">
+    <form id="turn-form" novalidate>
       <div class="modal-body">
         <div class="form-group">
           <label class="form-label" for="turn-service">Tipo de servicio</label>
-          <select class="form-control" id="turn-service" name="service">
-          </select>
+          <select class="form-control" id="turn-service" name="service"></select>
         </div>
         <div class="form-group" style="margin-bottom:0">
-          <label class="form-label" for="turn-notes">Notas adicionales <span style="color:rgba(255,255,255,.3);font-weight:400">(opcional)</span></label>
-          <textarea class="form-control" id="turn-notes" name="notes" placeholder="Describe brevemente tu trámite..."></textarea>
+          <label class="form-label" for="turn-notes">Notas <span style="color:rgba(255,255,255,.25);font-weight:400">(opcional)</span></label>
+          <textarea class="form-control" id="turn-notes" name="notes" placeholder="Describe brevemente tu trámite…" rows="3"></textarea>
         </div>
       </div>
-      <div class="modal-footer" style="border-top:1px solid rgba(255,255,255,.06);padding:16px 24px">
-        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-turn')">Cancelar</button>
-        <button type="submit" class="btn btn-primary">Confirmar turno</button>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="turn-form-cancel">Cancelar</button>
+        <button type="submit" class="btn btn-primary" id="turn-form-submit">Confirmar turno</button>
       </div>
     </form>
   </div>
@@ -271,111 +268,219 @@
 
 <script src="/assets/js/app.js"></script>
 <script>
-document.getElementById('today-date').textContent = new Date().toLocaleDateString('es-CO', { weekday:'short', day:'numeric', month:'short' });
+(function(){
+  const $  = id => document.getElementById(id);
+  const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const fmt = s => { if(!s) return '—'; return new Date(s).toLocaleString('es-CO',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); };
+  const sbadge = s => { const m={waiting:'En espera',active:'Activo',completed:'Completado',cancelled:'Cancelado'}; return `<span class="badge badge-${s}">${m[s]??s}</span>`; };
+  const pad = n => String(n).padStart(3,'0');
 
-document.getElementById('dismiss-notif')?.addEventListener('click', () => {
-  document.getElementById('notif-banner').classList.add('hidden');
-});
+  $('h-today-date').textContent = new Date().toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'});
 
-const _origRenderQueueData = typeof renderQueueData === 'function' ? renderQueueData : null;
+  let prevStatus = null;
+  let prevCurrent = null;
+  let myTurnId = null;
+  let servicesLoaded = false;
 
-function renderQueueData(data) {
-  if (!data || !data.success) return;
-
-  const ct = document.getElementById('current-turn-num');
-  if (ct) {
-    const val = data.current_turn;
-    ct.textContent = val ? String(val).padStart(3, '0') : '—';
-    ct.classList.toggle('no-turn', !val);
-  }
-
-  const svcEl = document.getElementById('active-service');
-  if (svcEl) svcEl.textContent = data.active_turn ? data.active_turn.service : 'Sin turno activo';
-
-  const wcEl = document.getElementById('waiting-count');
-  if (wcEl) wcEl.textContent = data.waiting_count ?? 0;
-
-  const sbWaiting = document.getElementById('sb-waiting');
-  if (sbWaiting) sbWaiting.textContent = data.waiting_count ?? 0;
-
-  const sbCurrent = document.getElementById('sb-current');
-  if (sbCurrent) sbCurrent.textContent = data.current_turn || '—';
-
-  const activeTurnDisplay = document.getElementById('active-turn-display');
-  if (activeTurnDisplay) {
-    if (data.active_turn) {
-      const t = data.active_turn;
-      activeTurnDisplay.innerHTML = `<div class="active-turn-card">
-        <div class="active-turn-num">#${t.turn_number}</div>
-        <div class="active-turn-info">
-          <div class="active-turn-label">En atención</div>
-          <div class="active-turn-service">${escHtml(t.service)}</div>
-          ${t.user_name ? `<div style="font-size:.75rem;color:rgba(255,255,255,.3);margin-top:2px">${escHtml(t.user_name)}</div>` : ''}
-        </div>
-        <div class="pulse-dot"></div>
-      </div>`;
-    } else {
-      activeTurnDisplay.innerHTML = '<div style="text-align:center;padding:12px 0;color:rgba(255,255,255,.25);font-size:.85rem">Sin turno activo</div>';
+  function applyQueueData(data) {
+    const ct = $('h-current-num');
+    if(ct){
+      const v = data.current_turn;
+      ct.textContent = v ? pad(v) : '—';
+      ct.classList.toggle('empty', !v);
     }
-  }
+    const as = $('h-active-svc');
+    if(as) as.textContent = data.active_turn ? data.active_turn.service : 'Sin turno activo';
+    const wc = $('h-waiting-count');
+    if(wc) wc.textContent = data.waiting_count ?? 0;
+    const sbw = $('sb-waiting');
+    if(sbw) sbw.textContent = data.waiting_count ?? 0;
+    const sbc = $('sb-current');
+    if(sbc) sbc.textContent = data.current_turn || '—';
 
-  const isMine = data.my_turn;
-  const isBanner = document.getElementById('is-my-turn-banner');
-
-  if (isMine) {
-    const t = isMine;
-    const isActive = t.status === 'active';
-
-    document.getElementById('my-turn-section').style.display = 'block';
-    document.getElementById('no-turn-section').style.display = 'none';
-    document.getElementById('request-turn-btn').style.display = 'none';
-
-    if (isBanner) isBanner.style.display = isActive ? 'flex' : 'none';
-
-    const mtn = document.getElementById('my-turn-number');
-    if (mtn) mtn.textContent = '#' + String(t.turn_number).padStart(3, '0');
-
-    const mtsvc = document.getElementById('my-turn-service-tag');
-    if (mtsvc) mtsvc.textContent = t.service;
-
-    const mtService = document.getElementById('my-turn-service');
-    if (mtService) mtService.textContent = t.service;
-
-    const mtStatus = document.getElementById('my-turn-status-badge');
-    if (mtStatus) mtStatus.innerHTML = statusBadge(t.status);
-
-    const mtp = document.getElementById('my-turn-position');
-    if (mtp) mtp.textContent = isActive ? '¡Es tu turno!' : (t.position ? `${t.position}°` : '—');
-
-    const mtTime = document.getElementById('my-turn-time');
-    if (mtTime) mtTime.textContent = t.created_at ? formatDateShort(t.created_at) : '—';
-
-    const prog = document.getElementById('queue-progress');
-    const progPct = document.getElementById('prog-pct');
-    const progWrap = document.getElementById('prog-wrap');
-    if (prog && progWrap) {
-      if (!isActive && t.position) {
-        progWrap.style.display = 'block';
-        const total = Math.max(1, data.waiting_count || 1);
-        const pct = Math.max(5, Math.min(95, Math.round((1 - (t.position - 1) / total) * 100)));
-        prog.style.width = pct + '%';
-        if (progPct) progPct.textContent = pct + '%';
+    const atd = $('active-turn-display');
+    if(atd){
+      if(data.active_turn){
+        const t = data.active_turn;
+        atd.innerHTML = `<div class="act-card"><div class="act-num">#${t.turn_number}</div><div class="act-info"><div class="act-lbl">En atención</div><div class="act-svc">${esc(t.service)}</div>${t.user_name?`<div style="font-size:.72rem;color:rgba(255,255,255,.25);margin-top:2px">${esc(t.user_name)}</div>`:''}</div><div class="pulse-dot"></div></div>`;
       } else {
-        progWrap.style.display = isActive ? 'none' : 'block';
-        if (isActive && prog) prog.style.width = '100%';
+        atd.innerHTML = '<div style="text-align:center;padding:10px 0;color:rgba(255,255,255,.2);font-size:.82rem">Sin turno activo</div>';
       }
     }
 
-    const cancelBtn = document.getElementById('cancel-turn-btn');
-    if (cancelBtn) cancelBtn.dataset.id = t.id;
+    const mt = data.my_turn;
+    const alert = $('my-turn-alert');
+    if(mt){
+      const isActive = mt.status === 'active';
+      myTurnId = mt.id;
+      $('my-turn-section').style.display = 'block';
+      $('no-turn-section').style.display = 'none';
+      if(alert) alert.style.display = isActive ? 'flex' : 'none';
 
-  } else {
-    document.getElementById('my-turn-section').style.display = 'none';
-    document.getElementById('no-turn-section').style.display = 'block';
-    document.getElementById('request-turn-btn').style.display = '';
-    if (isBanner) isBanner.style.display = 'none';
+      const num = $('my-turn-number');
+      if(num) num.textContent = '#' + pad(mt.turn_number);
+      const stag = $('my-turn-svc-tag');
+      if(stag) stag.textContent = mt.service;
+      const svc = $('my-turn-svc');
+      if(svc) svc.textContent = mt.service;
+      const badge = $('my-turn-badge');
+      if(badge) badge.innerHTML = sbadge(mt.status);
+      const pos = $('my-turn-pos');
+      if(pos) pos.textContent = isActive ? '¡Es tu turno!' : (mt.position ? `${mt.position}°` : '—');
+      const tm = $('my-turn-time');
+      if(tm) tm.textContent = mt.created_at ? fmt(mt.created_at) : '—';
+
+      const pw = $('prog-wrap');
+      const pf = $('prog-fill');
+      const pp = $('prog-pct');
+      if(pw && pf){
+        if(!isActive && mt.position){
+          pw.style.display = 'block';
+          const total = Math.max(1, data.waiting_count || 1);
+          const pct = Math.max(5, Math.min(95, Math.round((1-(mt.position-1)/total)*100)));
+          pf.style.width = pct + '%';
+          if(pp) pp.textContent = pct + '%';
+        } else {
+          pw.style.display = isActive ? 'none' : 'block';
+          if(isActive){ pf.style.width='100%'; }
+        }
+      }
+
+      if(prevStatus !== mt.status){
+        if(mt.status === 'active'){
+          if(typeof toast === 'function') toast('¡Es tu turno! Acércate a la ventanilla.','success',8000);
+          if(typeof sendNotification === 'function') sendNotification('¡Tu turno!','Es tu turno. Por favor acércate a la ventanilla.',{requireInteraction:true});
+        }
+        if(mt.status === 'cancelled' && prevStatus !== null){
+          if(typeof toast === 'function') toast('Tu turno fue cancelado.','warning');
+        }
+        prevStatus = mt.status;
+      }
+      if(mt.status === 'waiting' && mt.position <= 2 && prevCurrent !== data.current_turn){
+        if(typeof toast === 'function') toast('¡Prepárate! Estás próximo a ser atendido.','info',6000);
+        if(typeof sendNotification === 'function') sendNotification('¡Prepárate!',`Posición ${mt.position} en la cola.`);
+      }
+    } else {
+      myTurnId = null;
+      $('my-turn-section').style.display = 'none';
+      $('no-turn-section').style.display = 'block';
+      if(alert) alert.style.display = 'none';
+      if(prevStatus !== null) prevStatus = null;
+    }
+    prevCurrent = data.current_turn;
   }
-}
+
+  async function loadQueue(){
+    if(typeof api !== 'function') return;
+    const res = await api('get_queue');
+    if(res && res.success) applyQueueData(res);
+  }
+
+  async function loadServices(){
+    if(servicesLoaded) return;
+    const sel = $('turn-service');
+    if(!sel) return;
+    const res = await api('get_services');
+    const svcs = (res && res.services) ? res.services : ['Atención General','Trámites Documentales','Certificados','Consultas','Pagos y Recaudos','Orientación Ciudadana'];
+    sel.innerHTML = '';
+    svcs.forEach(s => { const o = document.createElement('option'); o.value = o.textContent = s; sel.appendChild(o); });
+    servicesLoaded = true;
+  }
+
+  async function init(){
+    if(typeof checkSession !== 'function'){ setTimeout(init, 80); return; }
+    const user = await checkSession();
+    if(!user){ location.href = '/auth/'; return; }
+
+    const ui = $('user-initial');
+    const un = $('user-name');
+    if(ui) ui.textContent = user.name[0].toUpperCase();
+    if(un) un.textContent = user.name;
+
+    if(typeof loadCsrf === 'function') await loadCsrf();
+
+    const nb = $('notif-bar');
+    if(nb && 'Notification' in window){
+      if(Notification.permission === 'default') nb.classList.remove('hidden');
+      $('btn-enable-notif')?.addEventListener('click', async () => {
+        if(typeof requestNotifPermission === 'function'){
+          const ok = await requestNotifPermission();
+          if(ok){ nb.classList.add('hidden'); if(typeof toast === 'function') toast('Notificaciones activadas.','success'); }
+          else if(typeof toast === 'function') toast('Permiso denegado.','warning');
+        }
+      });
+    }
+    $('btn-dismiss-notif')?.addEventListener('click', () => $('notif-bar')?.classList.add('hidden'));
+
+    $('logout-btn')?.addEventListener('click', async () => {
+      if(typeof api === 'function') await api('logout',{method:'POST'});
+      location.href = '/auth/';
+    });
+
+    $('request-turn-btn')?.addEventListener('click', async () => {
+      await loadServices();
+      if(typeof openModal === 'function') openModal('modal-turn');
+    });
+
+    $('turn-form-cancel')?.addEventListener('click', () => {
+      if(typeof closeModal === 'function') closeModal('modal-turn');
+    });
+
+    $('cancel-turn-btn')?.addEventListener('click', async () => {
+      if(!myTurnId) return;
+      const ok = typeof confirm === 'function' ? await confirm('Cancelar turno','¿Deseas cancelar tu turno?','Sí, cancelar',true) : window.confirm('¿Cancelar turno?');
+      if(!ok) return;
+      const res = await api('cancel_turn',{method:'POST',body:{id:myTurnId}});
+      if(typeof toast === 'function') toast(res.message, res.success ? 'success' : 'error');
+      if(res.success) await loadQueue();
+    });
+
+    $('turn-form')?.addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = $('turn-form-submit');
+      if(typeof setLoading === 'function') setLoading(btn, true);
+      const res = await api('create_turn',{
+        method:'POST',
+        body:{
+          service: $('turn-service')?.value || 'Atención General',
+          notes:   $('turn-notes')?.value || ''
+        }
+      });
+      if(typeof setLoading === 'function') setLoading(btn, false);
+      if(res.success){
+        if(typeof toast === 'function') toast(`Turno #${res.turn_number} asignado. Posición: ${res.position}`,'success');
+        if(typeof closeModal === 'function') closeModal('modal-turn');
+        const tf = $('turn-form');
+        if(tf) tf.reset();
+        await loadQueue();
+      } else {
+        if(typeof toast === 'function') toast(res.message,'error');
+      }
+    });
+
+    await loadQueue();
+
+    if(typeof connectSSE === 'function'){
+      connectSSE(data => {
+        if(data && data.type === 'queue_update'){
+          applyQueueData({
+            success: true,
+            current_turn:  data.current_turn,
+            active_turn:   data.active_turn,
+            waiting_count: data.waiting_count,
+            my_turn:       data.my_turn ?? null
+          });
+        }
+      });
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
 </script>
 </body>
 </html>

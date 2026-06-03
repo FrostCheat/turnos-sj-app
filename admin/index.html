@@ -8,70 +8,68 @@
 <link rel="icon" type="image/png" href="/assets/imgs/fav_icon.png">
 <link rel="stylesheet" href="/assets/css/styles.css">
 <style>
-.top-bar{position:fixed;top:0;left:260px;right:0;height:56px;z-index:700;background:rgba(250,250,248,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between;padding:0 28px;transition:var(--transition)}
+*,*::before,*::after{box-sizing:border-box}
+.top-bar{position:fixed;top:0;left:260px;right:0;height:56px;z-index:700;background:rgba(250,250,248,.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between;padding:0 28px;transition:var(--transition)}
 @media(max-width:768px){.top-bar{left:0}}
 .top-bar-left{display:flex;align-items:center;gap:12px}
 .top-bar-title{font-weight:600;font-size:.95rem;color:var(--gray-800)}
 .top-bar-right{display:flex;align-items:center;gap:10px}
 .main-content{padding-top:56px}
-.admin-content{padding:24px 28px 48px}
-@media(max-width:768px){.admin-content{padding:16px}}
-.section-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
-.section-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-@media(max-width:900px){.section-grid-2,.section-grid-3{grid-template-columns:1fr}}
-.queue-hero-card{background:linear-gradient(135deg,var(--black) 0%,#1e1e14 100%);border-radius:var(--radius-lg);padding:28px;position:relative;overflow:hidden;margin-bottom:24px}
-.queue-hero-card::before{content:'';position:absolute;top:-30%;right:5%;width:250px;height:250px;background:radial-gradient(circle,rgba(212,160,23,.18) 0%,transparent 70%);pointer-events:none}
-.queue-hero-inner{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;position:relative;z-index:1}
-.queue-hero-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.4);margin-bottom:6px;font-weight:600}
-.queue-hero-number{font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:700;color:var(--gold);line-height:1}
-.queue-hero-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.btn-dark{background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.1)}
-.btn-dark:hover{background:rgba(255,255,255,.14);color:var(--white)}
-.btn-gold{background:var(--gold);color:var(--black)}
+.admin-content{padding:24px 28px 56px}
+@media(max-width:768px){.admin-content{padding:16px 14px 40px}}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:900px){.g2,.g3{grid-template-columns:1fr}}
+.queue-hero{background:linear-gradient(135deg,var(--black) 0%,#1e1e12 100%);border-radius:var(--radius-lg);padding:26px 28px;position:relative;overflow:hidden;margin-bottom:24px}
+.queue-hero::before{content:'';position:absolute;top:-40%;right:4%;width:260px;height:260px;background:radial-gradient(circle,rgba(212,160,23,.15) 0%,transparent 70%);pointer-events:none}
+.qh-inner{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;position:relative;z-index:1}
+.qh-lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.38);margin-bottom:6px;font-weight:600}
+.qh-num{font-family:'Playfair Display',serif;font-size:3.2rem;font-weight:700;color:var(--gold);line-height:1}
+.qh-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn-dark{background:rgba(255,255,255,.08);color:rgba(255,255,255,.75);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius-sm);padding:7px 14px;font-size:.82rem;font-weight:500;cursor:pointer;transition:var(--transition)}
+.btn-dark:hover{background:rgba(255,255,255,.14);color:#fff}
+.btn-gold{background:var(--gold);color:var(--black);border:none;border-radius:var(--radius-sm);padding:9px 18px;font-size:.88rem;font-weight:600;cursor:pointer;transition:var(--transition)}
 .btn-gold:hover{background:var(--gold-deep)}
-.inline-tabs{display:flex;gap:2px;background:var(--gray-100);border-radius:var(--radius-sm);padding:3px}
-.inline-tab{padding:6px 16px;border-radius:6px;font-size:.82rem;font-weight:500;color:var(--gray-400);cursor:pointer;transition:var(--transition)}
-.inline-tab.active{background:var(--white);color:var(--gray-800);box-shadow:var(--shadow-sm)}
-.users-table-wrap,.turns-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-td.td-actions{width:1%;white-space:nowrap}
-.panel-toolbar{padding:14px 20px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.panel-toolbar .search-box{flex:1;min-width:160px;max-width:280px}
-.panel-footer{padding:12px 20px;border-top:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.panel-footer-info{font-size:.8rem;color:var(--gray-400)}
-.turn-number-badge{display:inline-block;background:var(--gold-pale);color:var(--gold-deep);border-radius:6px;padding:2px 10px;font-weight:700;font-size:.85rem;font-family:'Playfair Display',serif}
-.draggable-handle{cursor:grab;color:var(--gray-200);font-size:1.1rem;padding:0 4px}
-.draggable-handle:active{cursor:grabbing}
+.panel-toolbar{padding:12px 20px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.panel-toolbar .search-box{flex:1;min-width:150px;max-width:260px}
+.panel-foot{padding:10px 20px;border-top:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.foot-info{font-size:.78rem;color:var(--gray-400)}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.action-btns{display:flex;gap:3px;flex-wrap:nowrap}
+.action-btn{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.82rem;transition:var(--transition);flex-shrink:0;cursor:pointer;border:none}
+.action-btn:hover{transform:scale(1.1)}
+.action-btn.edit{background:var(--info-light);color:var(--info)}
+.action-btn.delete{background:var(--danger-light);color:var(--danger)}
+.action-btn.complete{background:var(--success-light);color:var(--success)}
+.action-btn.cancel{background:var(--warning-light);color:var(--warning)}
+.draggable-row{cursor:grab}
+.draggable-row.dragging{opacity:.35}
+.draggable-row.drag-over{border-top:2px solid var(--gold)}
+.skel{background:linear-gradient(90deg,var(--gray-100) 25%,var(--gray-50) 50%,var(--gray-100) 75%);background-size:400px 100%;animation:sk 1.4s infinite;border-radius:4px}
+@keyframes sk{from{background-position:-200px 0}to{background-position:200px 0}}
+.today-badge{display:inline-flex;align-items:center;gap:6px;background:var(--gold-pale);border:1px solid rgba(212,160,23,.25);border-radius:20px;padding:3px 10px;font-size:.75rem;color:var(--gold-deep);margin-left:8px;font-weight:500}
 </style>
 </head>
 <body data-page="admin">
 <div id="toast-container"></div>
 
 <div class="app-layout">
-
   <aside class="sidebar" id="admin-sidebar">
     <div class="sidebar-logo">
       <img src="/assets/imgs/icon.png" alt="Logo">
       <span>Secretaría Santa Juana</span>
     </div>
-
     <nav class="sidebar-nav">
       <div class="sidebar-section">
         <div class="sidebar-section-label">Principal</div>
-        <a href="#" class="sidebar-link active" data-section="dashboard">
-          <span class="icon">📊</span> Panel general
-        </a>
+        <a href="#" class="sidebar-link active" data-section="dashboard"><span class="icon">📊</span> Panel general</a>
       </div>
       <div class="sidebar-section">
         <div class="sidebar-section-label">Gestión</div>
-        <a href="#" class="sidebar-link" data-section="turns">
-          <span class="icon">🎫</span> Turnos
-        </a>
-        <a href="#" class="sidebar-link" data-section="users">
-          <span class="icon">👥</span> Usuarios
-        </a>
+        <a href="#" class="sidebar-link" data-section="turns"><span class="icon">🎫</span> Turnos</a>
+        <a href="#" class="sidebar-link" data-section="users"><span class="icon">👥</span> Usuarios</a>
       </div>
     </nav>
-
     <div class="sidebar-user">
       <div class="sidebar-user-info">
         <div class="avatar" id="admin-initial">A</div>
@@ -80,14 +78,13 @@ td.td-actions{width:1%;white-space:nowrap}
           <div class="user-role">Administrador</div>
         </div>
       </div>
-      <button id="logout-btn-admin" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;color:rgba(255,255,255,.35);margin-top:6px">Cerrar sesión</button>
+      <button id="logout-btn-admin" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;color:rgba(255,255,255,.3);margin-top:6px">Cerrar sesión</button>
     </div>
   </aside>
 
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
   <div class="main-content">
-
     <div class="top-bar">
       <div class="top-bar-left">
         <button class="btn btn-ghost btn-icon" id="sidebar-toggle" style="display:none;align-items:center;justify-content:center" aria-label="Menú">☰</button>
@@ -95,110 +92,55 @@ td.td-actions{width:1%;white-space:nowrap}
       </div>
       <div class="top-bar-right">
         <span id="conn-status" class="conn-badge disconnected">● Conectando</span>
-        <div class="avatar" id="admin-initial-top" style="width:32px;height:32px;font-size:.8rem">A</div>
+        <div class="avatar" id="admin-avatar-top" style="width:32px;height:32px;font-size:.78rem">A</div>
       </div>
     </div>
 
     <div class="admin-content">
-
       <div id="section-dashboard" class="admin-section">
         <div class="page-header">
           <div class="page-title">Panel general</div>
           <div class="page-subtitle">Resumen en tiempo real del sistema de turnos.</div>
         </div>
 
-        <div class="queue-hero-card">
-          <div class="queue-hero-inner">
+        <div class="queue-hero">
+          <div class="qh-inner">
             <div>
-              <div class="queue-hero-label">Turno actual</div>
-              <div class="queue-hero-number" id="current-turn-admin">0</div>
+              <div class="qh-lbl">Turno actual</div>
+              <div class="qh-num" id="current-turn-admin">0</div>
             </div>
-            <div class="queue-hero-actions">
-              <button id="btn-decrease-turn" class="btn btn-dark btn-sm">− Anterior</button>
-              <button id="btn-increase-turn" class="btn btn-dark btn-sm">+ Siguiente</button>
-              <button id="btn-activate-next" class="btn btn-gold">▶ Llamar siguiente</button>
+            <div class="qh-actions">
+              <button id="btn-decrease-turn" class="btn-dark">− Anterior</button>
+              <button id="btn-increase-turn" class="btn-dark">+ Siguiente</button>
+              <button id="btn-activate-next" class="btn-gold">▶ Llamar siguiente</button>
             </div>
           </div>
         </div>
 
         <div class="stats-grid" style="margin-bottom:28px">
-          <div class="stat-card">
-            <div class="stat-icon blue">👥</div>
-            <div>
-              <div class="stat-value" id="stat-total-users">0</div>
-              <div class="stat-label">Usuarios registrados</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon gold">🎫</div>
-            <div>
-              <div class="stat-value" id="stat-total-turns">0</div>
-              <div class="stat-label">Turnos totales</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon orange">⏳</div>
-            <div>
-              <div class="stat-value" id="stat-waiting">0</div>
-              <div class="stat-label">En espera</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon green">✅</div>
-            <div>
-              <div class="stat-value" id="stat-active">0</div>
-              <div class="stat-label">En atención</div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon blue">🏁</div>
-            <div>
-              <div class="stat-value" id="stat-completed">0</div>
-              <div class="stat-label">Completados</div>
-            </div>
-          </div>
+          <div class="stat-card"><div class="stat-icon blue">👥</div><div><div class="stat-value" id="stat-total-users">—</div><div class="stat-label">Usuarios registrados</div></div></div>
+          <div class="stat-card"><div class="stat-icon gold">🎫</div><div><div class="stat-value" id="stat-total-turns">—</div><div class="stat-label">Turnos totales</div></div></div>
+          <div class="stat-card"><div class="stat-icon orange">⏳</div><div><div class="stat-value" id="stat-waiting">—</div><div class="stat-label">En espera</div></div></div>
+          <div class="stat-card"><div class="stat-icon green">✅</div><div><div class="stat-value" id="stat-active">—</div><div class="stat-label">En atención</div></div></div>
+          <div class="stat-card"><div class="stat-icon blue">🏁</div><div><div class="stat-value" id="stat-completed">—</div><div class="stat-label">Completados</div></div></div>
         </div>
 
-        <div class="section-grid-2">
+        <div class="g2">
           <div class="panel">
-            <div class="panel-header">
-              <span class="panel-title">Turnos recientes</span>
-            </div>
-            <div class="table-wrap">
+            <div class="panel-header"><span class="panel-title">Turnos recientes</span></div>
+            <div class="tbl-wrap">
               <table>
-                <thead>
-                  <tr>
-                    <th>Turno</th>
-                    <th>Usuario</th>
-                    <th>Servicio</th>
-                    <th>Estado</th>
-                    <th>Hora</th>
-                  </tr>
-                </thead>
-                <tbody id="recent-turns-body">
-                  <tr><td colspan="5" class="empty-state"><div class="skeleton" style="height:36px;margin:8px 16px;border-radius:4px"></div></td></tr>
-                </tbody>
+                <thead><tr><th>Turno</th><th>Usuario</th><th>Servicio</th><th>Estado</th><th>Hora</th></tr></thead>
+                <tbody id="recent-turns-body"><tr><td colspan="5"><div class="skel" style="height:36px;margin:8px 16px"></div></td></tr></tbody>
               </table>
             </div>
           </div>
-
           <div class="panel">
-            <div class="panel-header">
-              <span class="panel-title">Turnos por servicio</span>
-            </div>
-            <div class="table-wrap">
+            <div class="panel-header"><span class="panel-title">Turnos por servicio</span></div>
+            <div class="tbl-wrap">
               <table>
-                <thead>
-                  <tr>
-                    <th>Servicio</th>
-                    <th>Total</th>
-                    <th>Completados</th>
-                    <th>En espera</th>
-                  </tr>
-                </thead>
-                <tbody id="service-stats-body">
-                  <tr><td colspan="4" class="empty-state"><div class="skeleton" style="height:36px;margin:8px 16px;border-radius:4px"></div></td></tr>
-                </tbody>
+                <thead><tr><th>Servicio</th><th>Total</th><th>Completados</th><th>En espera</th></tr></thead>
+                <tbody id="service-stats-body"><tr><td colspan="4"><div class="skel" style="height:36px;margin:8px 16px"></div></td></tr></tbody>
               </table>
             </div>
           </div>
@@ -207,47 +149,28 @@ td.td-actions{width:1%;white-space:nowrap}
 
       <div id="section-turns" class="admin-section" style="display:none">
         <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
-          <div>
-            <div class="page-title">Gestión de turnos</div>
-            <div class="page-subtitle">Administra y controla la cola de atención.</div>
-          </div>
+          <div><div class="page-title">Gestión de turnos</div><div class="page-subtitle">Administra y controla la cola de atención.</div></div>
           <button id="btn-new-turn" class="btn btn-primary">+ Nuevo turno</button>
         </div>
-
         <div class="panel">
           <div class="panel-toolbar">
-            <div class="search-box">
-              <input type="search" class="form-control" id="admin-search-turns" placeholder="Buscar turno, usuario...">
-            </div>
+            <div class="search-box"><input type="search" class="form-control" id="admin-search-turns" placeholder="Buscar turno, usuario…"></div>
             <div class="filter-tabs">
-              <button class="filter-tab active" data-filter-status="">Todos</button>
-              <button class="filter-tab" data-filter-status="waiting">En espera</button>
-              <button class="filter-tab" data-filter-status="active">Activo</button>
-              <button class="filter-tab" data-filter-status="completed">Completado</button>
-              <button class="filter-tab" data-filter-status="cancelled">Cancelado</button>
+              <button class="filter-tab active" data-filter="">Todos</button>
+              <button class="filter-tab" data-filter="waiting">En espera</button>
+              <button class="filter-tab" data-filter="active">Activo</button>
+              <button class="filter-tab" data-filter="completed">Completado</button>
+              <button class="filter-tab" data-filter="cancelled">Cancelado</button>
             </div>
-            <span id="turns-total" class="panel-footer-info" style="margin-left:auto"></span>
+            <span id="turns-count" class="foot-info" style="margin-left:auto"></span>
           </div>
-          <div class="turns-table-wrap">
+          <div class="tbl-wrap">
             <table>
-              <thead>
-                <tr>
-                  <th style="width:40px"></th>
-                  <th>Turno</th>
-                  <th>Usuario</th>
-                  <th>Servicio</th>
-                  <th>Estado</th>
-                  <th>Pos.</th>
-                  <th>Fecha</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody id="turns-tbody">
-                <tr><td colspan="8"><div class="skeleton" style="height:40px;border-radius:4px;margin:8px 16px"></div></td></tr>
-              </tbody>
+              <thead><tr><th style="width:36px"></th><th>Turno</th><th>Usuario</th><th>Servicio</th><th>Estado</th><th>Pos.</th><th>Fecha</th><th>Acciones</th></tr></thead>
+              <tbody id="turns-tbody"><tr><td colspan="8"><div class="skel" style="height:40px;margin:8px 16px"></div></td></tr></tbody>
             </table>
           </div>
-          <div class="panel-footer">
+          <div class="panel-foot">
             <div id="turns-pagination" class="pagination" style="padding:0"></div>
           </div>
         </div>
@@ -255,44 +178,25 @@ td.td-actions{width:1%;white-space:nowrap}
 
       <div id="section-users" class="admin-section" style="display:none">
         <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
-          <div>
-            <div class="page-title">Gestión de usuarios</div>
-            <div class="page-subtitle">Administra las cuentas de acceso al sistema.</div>
-          </div>
+          <div><div class="page-title">Gestión de usuarios</div><div class="page-subtitle">Administra las cuentas de acceso al sistema.</div></div>
           <button id="btn-new-user" class="btn btn-primary">+ Nuevo usuario</button>
         </div>
-
         <div class="panel">
           <div class="panel-toolbar">
-            <div class="search-box">
-              <input type="search" class="form-control" id="admin-search-users" placeholder="Buscar nombre, correo, teléfono...">
-            </div>
-            <span id="users-total" class="panel-footer-info" style="margin-left:auto"></span>
+            <div class="search-box"><input type="search" class="form-control" id="admin-search-users" placeholder="Buscar nombre, correo, teléfono…"></div>
+            <span id="users-count" class="foot-info" style="margin-left:auto"></span>
           </div>
-          <div class="users-table-wrap">
+          <div class="tbl-wrap">
             <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nombre</th>
-                  <th>Correo</th>
-                  <th>Teléfono</th>
-                  <th>Rol</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody id="users-tbody">
-                <tr><td colspan="7"><div class="skeleton" style="height:40px;border-radius:4px;margin:8px 16px"></div></td></tr>
-              </tbody>
+              <thead><tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
+              <tbody id="users-tbody"><tr><td colspan="7"><div class="skel" style="height:40px;margin:8px 16px"></div></td></tr></tbody>
             </table>
           </div>
-          <div class="panel-footer">
+          <div class="panel-foot">
             <div id="users-pagination" class="pagination" style="padding:0"></div>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </div>
@@ -308,23 +212,23 @@ td.td-actions{width:1%;white-space:nowrap}
         <div class="form-group">
           <label class="form-label" for="u-name">Nombre completo</label>
           <input class="form-control" type="text" id="u-name" name="name" placeholder="Nombre completo" required>
-          <span class="form-error" id="err-name"></span>
+          <span class="form-error" id="err-u-name"></span>
         </div>
         <div class="form-group">
           <label class="form-label" for="u-email">Correo electrónico</label>
           <input class="form-control" type="email" id="u-email" name="email" placeholder="correo@ejemplo.com" required>
-          <span class="form-error" id="err-email"></span>
+          <span class="form-error" id="err-u-email"></span>
         </div>
         <div class="form-group">
           <label class="form-label" for="u-phone">Teléfono</label>
           <input class="form-control" type="tel" id="u-phone" name="phone" placeholder="300 000 0000">
         </div>
-        <div class="form-group" id="user-pass-field">
+        <div class="form-group" id="u-pass-group">
           <label class="form-label" for="u-password">Contraseña</label>
           <input class="form-control" type="password" id="u-password" name="password" placeholder="Mínimo 8 caracteres">
-          <span class="form-error" id="err-password"></span>
+          <span class="form-error" id="err-u-password"></span>
         </div>
-        <div class="form-group" id="user-pass-change" style="display:none">
+        <div class="form-group" id="u-pass-change-group" style="display:none">
           <label class="form-label" for="u-new-password">Nueva contraseña <span style="color:var(--gray-400);font-weight:400">(dejar vacío para no cambiar)</span></label>
           <input class="form-control" type="password" id="u-new-password" name="new_password" placeholder="Nueva contraseña (opcional)">
         </div>
@@ -346,7 +250,7 @@ td.td-actions{width:1%;white-space:nowrap}
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-user')">Cancelar</button>
+        <button type="button" class="btn btn-secondary" id="user-form-cancel">Cancelar</button>
         <button type="submit" class="btn btn-primary">Guardar</button>
       </div>
     </form>
@@ -356,25 +260,24 @@ td.td-actions{width:1%;white-space:nowrap}
 <div class="modal-backdrop" id="modal-turn-admin">
   <div class="modal">
     <div class="modal-header">
-      <h3 id="turn-modal-title">Nuevo turno</h3>
+      <h3 id="turn-modal-title-admin">Nuevo turno</h3>
       <button class="modal-close" aria-label="Cerrar">✕</button>
     </div>
     <form id="turn-form-admin" novalidate>
       <div class="modal-body">
-        <div class="form-group" id="turn-user-group">
-          <label class="form-label" for="turn-user-select">Usuario</label>
-          <select class="form-control" id="turn-user-select">
+        <div class="form-group" id="ta-user-group">
+          <label class="form-label" for="ta-user-select">Usuario</label>
+          <select class="form-control" id="ta-user-select">
             <option value="">— Seleccionar usuario —</option>
           </select>
         </div>
         <div class="form-group">
-          <label class="form-label" for="turn-service-admin">Servicio</label>
-          <select class="form-control" id="turn-service-admin">
-          </select>
+          <label class="form-label" for="ta-service">Servicio</label>
+          <select class="form-control" id="ta-service"></select>
         </div>
-        <div class="form-group" id="turn-status-group" style="display:none">
-          <label class="form-label" for="turn-status-admin">Estado</label>
-          <select class="form-control" id="turn-status-admin">
+        <div class="form-group" id="ta-status-group" style="display:none">
+          <label class="form-label" for="ta-status">Estado</label>
+          <select class="form-control" id="ta-status">
             <option value="waiting">En espera</option>
             <option value="active">Activo</option>
             <option value="completed">Completado</option>
@@ -382,12 +285,12 @@ td.td-actions{width:1%;white-space:nowrap}
           </select>
         </div>
         <div class="form-group" style="margin-bottom:0">
-          <label class="form-label" for="turn-notes-admin">Notas <span style="color:var(--gray-400);font-weight:400">(opcional)</span></label>
-          <textarea class="form-control" id="turn-notes-admin" placeholder="Notas adicionales..."></textarea>
+          <label class="form-label" for="ta-notes">Notas <span style="color:var(--gray-400);font-weight:400">(opcional)</span></label>
+          <textarea class="form-control" id="ta-notes" placeholder="Notas adicionales…" rows="3"></textarea>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="closeModal('modal-turn-admin')">Cancelar</button>
+        <button type="button" class="btn btn-secondary" id="turn-form-cancel">Cancelar</button>
         <button type="submit" class="btn btn-primary">Guardar</button>
       </div>
     </form>
@@ -396,51 +299,418 @@ td.td-actions{width:1%;white-space:nowrap}
 
 <script src="/assets/js/app.js"></script>
 <script>
-const sidebarToggle = document.getElementById('sidebar-toggle');
-if (sidebarToggle) {
-  if (window.innerWidth <= 768) sidebarToggle.style.display = 'flex';
-  window.addEventListener('resize', () => {
-    sidebarToggle.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
-  });
-}
+(function(){
+  const $  = id => document.getElementById(id);
+  const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const fmt = s => { if(!s) return '—'; return new Date(s).toLocaleString('es-CO',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); };
+  const sbadge = s => { const m={waiting:'En espera',active:'Activo',completed:'Completado',cancelled:'Cancelado'}; return `<span class="badge badge-${s}">${m[s]??s}</span>`; };
+  const rbadge = r => `<span class="badge badge-${r}">${r==='admin'?'Administrador':'Usuario'}</span>`;
+  const dbg = fn => { let t; return (...a) => { clearTimeout(t); t = setTimeout(()=>fn(...a), 350); }; };
 
-const sectionTitles = { dashboard: 'Panel general', turns: 'Gestión de turnos', users: 'Gestión de usuarios' };
-const _origShowSection = typeof showSection === 'function' ? showSection : null;
+  const ST = {
+    usersPage:1, usersSearch:'', usersPages:1,
+    turnsPage:1, turnsSearch:'', turnsFilter:'', turnsPages:1,
+    section:'dashboard',
+    editingUserId:null,
+    editingTurnId:null,
+    services:[],
+    dragSrc:null
+  };
 
-function showSectionTitle(name) {
-  const el = document.getElementById('topbar-title');
-  if (el) el.textContent = sectionTitles[name] || name;
-}
+  const sectionTitles = {dashboard:'Panel general',turns:'Gestión de turnos',users:'Gestión de usuarios'};
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.sidebar-link[data-section]').forEach(link => {
-    link.addEventListener('click', () => showSectionTitle(link.dataset.section));
-  });
-
-  const adminInitialTop = document.getElementById('admin-initial-top');
-  const adminInitial = document.getElementById('admin-initial');
-  const mutObs = new MutationObserver(() => {
-    if (adminInitial && adminInitialTop) adminInitialTop.textContent = adminInitial.textContent;
-  });
-  if (adminInitial) mutObs.observe(adminInitial, { childList: true });
-
-  const turnStatusGroup = document.getElementById('turn-status-group');
-  const turnUserGroup = document.getElementById('turn-user-group');
-  const originalOpenTurnModal = typeof openTurnModal === 'function' ? openTurnModal : null;
-  if (originalOpenTurnModal) {
-    window._patchedTurnModal = true;
+  function updateCurrentTurn(val){
+    const el = $('current-turn-admin');
+    if(el) el.textContent = val ?? 0;
   }
 
-  const observer = new MutationObserver(() => {
-    const form = document.getElementById('turn-form-admin');
-    if (!form) return;
-    const isEdit = !!form.dataset.id;
-    if (turnStatusGroup) turnStatusGroup.style.display = isEdit ? '' : 'none';
-    if (turnUserGroup) turnUserGroup.style.display = isEdit ? 'none' : '';
-  });
-  const form = document.getElementById('turn-form-admin');
-  if (form) observer.observe(form, { attributes: true, attributeFilter: ['data-id'] });
-});
+  function showSection(name){
+    ST.section = name;
+    document.querySelectorAll('.admin-section').forEach(s => s.style.display='none');
+    const el = $('section-'+name);
+    if(el) el.style.display = 'block';
+    document.querySelectorAll('.sidebar-link[data-section]').forEach(l => l.classList.toggle('active', l.dataset.section===name));
+    const tt = $('topbar-title');
+    if(tt) tt.textContent = sectionTitles[name] || name;
+    if(name==='dashboard') loadDashboard();
+    if(name==='users') loadUsers();
+    if(name==='turns') loadTurns();
+  }
+
+  async function loadDashboard(){
+    const res = await api('get_dashboard');
+    if(!res || !res.success) return;
+    const s = res.stats;
+    [['stat-total-users',s.total_users],['stat-total-turns',s.total_turns],['stat-waiting',s.waiting_turns],['stat-active',s.active_turns],['stat-completed',s.completed_turns]].forEach(([id,v])=>{
+      const el=$(id); if(el) el.textContent = v??0;
+    });
+    updateCurrentTurn(s.current_turn);
+
+    const rb = $('recent-turns-body');
+    if(rb){
+      if(!res.recent_turns || !res.recent_turns.length){
+        rb.innerHTML='<tr><td colspan="5" class="empty-state"><div class="empty-state-icon">📋</div><p>Sin turnos recientes.</p></td></tr>';
+      } else {
+        rb.innerHTML = res.recent_turns.map(t=>`<tr><td><strong>#${t.turn_number}</strong></td><td>${esc(t.user_name)}</td><td>${esc(t.service)}</td><td>${sbadge(t.status)}</td><td>${fmt(t.created_at)}</td></tr>`).join('');
+      }
+    }
+    const sb = $('service-stats-body');
+    if(sb){
+      if(!res.by_service || !res.by_service.length){
+        sb.innerHTML='<tr><td colspan="4" class="empty-state"><p>Sin datos aún.</p></td></tr>';
+      } else {
+        sb.innerHTML = res.by_service.map(s=>`<tr><td>${esc(s.service)}</td><td>${s.total}</td><td>${s.completed}</td><td>${s.waiting}</td></tr>`).join('');
+      }
+    }
+  }
+
+  async function loadUsers(){
+    const tbody = $('users-tbody');
+    if(!tbody) return;
+    tbody.innerHTML=`<tr><td colspan="7"><div class="skel" style="height:40px;margin:8px 16px"></div></td></tr>`;
+    const res = await api('get_users',{params:{search:ST.usersSearch,page:ST.usersPage,per_page:20}});
+    if(!res||!res.success){tbody.innerHTML=`<tr><td colspan="7" class="empty-state"><p>${esc(res?.message||'Error')}</p></td></tr>`;return;}
+    ST.usersPages = res.pages;
+    const cnt=$('users-count'); if(cnt) cnt.textContent=`${res.total} usuario${res.total!==1?'s':''}`;
+    if(!res.users.length){
+      tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">👥</div><p>Sin usuarios encontrados.</p></div></td></tr>';
+    } else {
+      tbody.innerHTML = res.users.map(u=>`<tr><td>${u.id}</td><td><strong>${esc(u.name)}</strong></td><td>${esc(u.email)}</td><td>${esc(u.phone||'—')}</td><td>${rbadge(u.role)}</td><td><span class="badge ${u.is_active?'badge-active':'badge-cancelled'}">${u.is_active?'Activo':'Inactivo'}</span></td><td><div class="action-btns"><button class="action-btn edit" title="Editar" data-action="edit-user" data-id="${u.id}">✎</button><button class="action-btn delete" title="Eliminar" data-action="del-user" data-id="${u.id}" data-name="${esc(u.name)}">🗑</button></div></td></tr>`).join('');
+    }
+    renderPag('users-pagination', ST.usersPage, ST.usersPages, p=>{ST.usersPage=p;loadUsers();});
+  }
+
+  async function loadTurns(){
+    const tbody = $('turns-tbody');
+    if(!tbody) return;
+    tbody.innerHTML=`<tr><td colspan="8"><div class="skel" style="height:40px;margin:8px 16px"></div></td></tr>`;
+    const res = await api('get_turns',{params:{search:ST.turnsSearch,status:ST.turnsFilter,page:ST.turnsPage,per_page:20}});
+    if(!res||!res.success){tbody.innerHTML=`<tr><td colspan="8" class="empty-state"><p>${esc(res?.message||'Error')}</p></td></tr>`;return;}
+    ST.turnsPages = res.pages;
+    const cnt=$('turns-count'); if(cnt) cnt.textContent=`${res.total} turno${res.total!==1?'s':''}`;
+    if(!res.turns.length){
+      tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="empty-state-icon">🎫</div><p>Sin turnos encontrados.</p></div></td></tr>';
+    } else {
+      tbody.innerHTML = res.turns.map(t=>`<tr class="draggable-row" data-id="${t.id}" draggable="${t.status==='waiting'}">
+        <td style="color:var(--gray-200);cursor:grab;text-align:center;user-select:none">⠿</td>
+        <td><strong>#${t.turn_number}</strong></td>
+        <td>${esc(t.user_name)}</td>
+        <td>${esc(t.service)}</td>
+        <td>${sbadge(t.status)}</td>
+        <td>${t.position??'—'}</td>
+        <td>${fmt(t.created_at)}</td>
+        <td><div class="action-btns">
+          <button class="action-btn edit" title="Editar" data-action="edit-turn" data-id="${t.id}">✎</button>
+          ${t.status==='waiting'?`<button class="action-btn complete" title="Activar" data-action="activate-turn" data-id="${t.id}">▶</button>`:''}
+          ${t.status==='active'?`<button class="action-btn complete" title="Completar" data-action="complete-turn" data-id="${t.id}">✓</button>`:''}
+          ${['waiting','active'].includes(t.status)?`<button class="action-btn cancel" title="Cancelar" data-action="cancel-turn" data-id="${t.id}">✕</button>`:''}
+          <button class="action-btn delete" title="Eliminar" data-action="del-turn" data-id="${t.id}">🗑</button>
+        </div></td>
+      </tr>`).join('');
+      initDrag();
+    }
+    renderPag('turns-pagination', ST.turnsPage, ST.turnsPages, p=>{ST.turnsPage=p;loadTurns();});
+  }
+
+  function renderPag(containerId, current, total, onPage){
+    const el=$(containerId);
+    if(!el||total<=1){if(el)el.innerHTML='';return;}
+    let h='';
+    if(current>1) h+=`<button class="page-btn" data-pg="${current-1}">‹</button>`;
+    for(let i=Math.max(1,current-2);i<=Math.min(total,current+2);i++){
+      h+=`<button class="page-btn${i===current?' active':''}" data-pg="${i}">${i}</button>`;
+    }
+    if(current<total) h+=`<button class="page-btn" data-pg="${current+1}">›</button>`;
+    el.innerHTML=h;
+    el.querySelectorAll('.page-btn[data-pg]').forEach(b=>b.addEventListener('click',()=>onPage(+b.dataset.pg)));
+  }
+
+  async function loadServicesOnce(){
+    if(ST.services.length) return;
+    const res = await api('get_services');
+    ST.services = (res&&res.services) ? res.services : ['Atención General','Trámites Documentales','Certificados','Consultas','Pagos y Recaudos','Orientación Ciudadana'];
+  }
+
+  function fillServiceSelect(selId){
+    const sel=$(selId); if(!sel) return;
+    sel.innerHTML='';
+    ST.services.forEach(s=>{const o=document.createElement('option');o.value=o.textContent=s;sel.appendChild(o);});
+  }
+
+  async function openUserModal(id){
+    ST.editingUserId = id || null;
+    $('user-modal-title').textContent = id ? 'Editar Usuario' : 'Nuevo Usuario';
+    const form = $('user-form');
+    if(!form) return;
+    form.reset();
+    if(typeof clearFieldErrors === 'function') clearFieldErrors(form);
+    $('u-pass-group').style.display = id ? 'none' : '';
+    const passInput = $('u-password'); if(passInput) passInput.required = !id;
+    $('u-pass-change-group').style.display = id ? '' : 'none';
+    if(id){
+      const res = await api('get_user',{params:{id}});
+      if(res&&res.success){
+        const u=res.user;
+        $('u-name').value=u.name||'';
+        $('u-email').value=u.email||'';
+        $('u-phone').value=u.phone||'';
+        $('u-role').value=u.role||'user';
+        $('u-active').value=String(u.is_active);
+      }
+    }
+    if(typeof openModal==='function') openModal('modal-user');
+  }
+
+  async function openTurnModal(id){
+    ST.editingTurnId = id || null;
+    $('turn-modal-title-admin').textContent = id ? 'Editar Turno' : 'Nuevo Turno';
+    const form = $('turn-form-admin');
+    if(!form) return;
+    form.reset();
+    if(typeof clearFieldErrors==='function') clearFieldErrors(form);
+    await loadServicesOnce();
+    fillServiceSelect('ta-service');
+    if(!id){
+      $('ta-user-group').style.display='';
+      $('ta-status-group').style.display='none';
+      const usersRes = await api('get_users',{params:{per_page:100}});
+      const sel=$('ta-user-select');
+      if(sel&&usersRes.success){
+        sel.innerHTML='<option value="">— Seleccionar usuario —</option>';
+        usersRes.users.forEach(u=>{const o=document.createElement('option');o.value=u.id;o.textContent=`${u.name} (${u.email})`;sel.appendChild(o);});
+      }
+    } else {
+      $('ta-user-group').style.display='none';
+      $('ta-status-group').style.display='';
+      const res = await api('get_turn',{params:{id}});
+      if(res&&res.success){
+        const t=res.turn;
+        $('ta-service').value=t.service;
+        $('ta-notes').value=t.notes||'';
+        $('ta-status').value=t.status;
+      }
+    }
+    if(typeof openModal==='function') openModal('modal-turn-admin');
+  }
+
+  function initDrag(){
+    const rows = document.querySelectorAll('.draggable-row[draggable="true"]');
+    rows.forEach(row=>{
+      row.addEventListener('dragstart',e=>{ST.dragSrc=row;e.dataTransfer.effectAllowed='move';row.classList.add('dragging');});
+      row.addEventListener('dragend',()=>{row.classList.remove('dragging');document.querySelectorAll('.draggable-row').forEach(r=>r.classList.remove('drag-over'));});
+      row.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';document.querySelectorAll('.draggable-row').forEach(r=>r.classList.remove('drag-over'));row.classList.add('drag-over');});
+      row.addEventListener('drop',async e=>{
+        e.stopPropagation();
+        if(ST.dragSrc===row) return;
+        const tbody=row.parentNode;
+        const all=Array.from(tbody.querySelectorAll('.draggable-row'));
+        const fi=all.indexOf(ST.dragSrc), ti=all.indexOf(row);
+        if(fi<ti) row.parentNode.insertBefore(ST.dragSrc,row.nextSibling);
+        else row.parentNode.insertBefore(ST.dragSrc,row);
+        const ids=Array.from(tbody.querySelectorAll('.draggable-row')).map(r=>+r.dataset.id);
+        const res=await api('reorder_queue',{method:'POST',body:{ids}});
+        if(!res.success&&typeof toast==='function') toast(res.message,'error');
+      });
+    });
+  }
+
+  async function init(){
+    if(typeof checkSession!=='function'){setTimeout(init,80);return;}
+    const user = await checkSession();
+    if(!user){location.href='/auth/';return;}
+    if(user.role!=='admin'){location.href='/home/';return;}
+
+    $('admin-name').textContent=user.name;
+    const ini=user.name[0].toUpperCase();
+    $('admin-initial').textContent=ini;
+    $('admin-avatar-top').textContent=ini;
+
+    if(typeof loadCsrf==='function') await loadCsrf();
+
+    const tog=$('sidebar-toggle');
+    const sb=$('admin-sidebar');
+    const ov=$('sidebar-overlay');
+    if(tog){
+      const updTog=()=>{tog.style.display=window.innerWidth<=768?'flex':'none';};
+      updTog();
+      window.addEventListener('resize',updTog);
+    }
+    tog?.addEventListener('click',()=>{sb.classList.toggle('open');ov.classList.toggle('open');});
+    ov?.addEventListener('click',()=>{sb.classList.remove('open');ov.classList.remove('open');});
+
+    document.querySelectorAll('.sidebar-link[data-section]').forEach(link=>{
+      link.addEventListener('click',e=>{
+        e.preventDefault();
+        showSection(link.dataset.section);
+        if(window.innerWidth<=768){sb.classList.remove('open');ov.classList.remove('open');}
+      });
+    });
+
+    $('logout-btn-admin')?.addEventListener('click',async()=>{
+      if(typeof api==='function') await api('logout',{method:'POST'});
+      location.href='/auth/';
+    });
+
+    $('admin-search-users')?.addEventListener('input',dbg(e=>{ST.usersSearch=e.target.value;ST.usersPage=1;loadUsers();}));
+    $('admin-search-turns')?.addEventListener('input',dbg(e=>{ST.turnsSearch=e.target.value;ST.turnsPage=1;loadTurns();}));
+
+    document.querySelectorAll('.filter-tab[data-filter]').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.querySelectorAll('.filter-tab[data-filter]').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        ST.turnsFilter=btn.dataset.filter;
+        ST.turnsPage=1;
+        loadTurns();
+      });
+    });
+
+    $('btn-activate-next')?.addEventListener('click',async()=>{
+      const res=await api('activate_next',{method:'POST'});
+      if(typeof toast==='function') toast(res.message,res.success?'success':'warning');
+      if(res.success){await loadDashboard();await loadTurns();}
+    });
+
+    $('btn-increase-turn')?.addEventListener('click',async()=>{
+      const res=await api('increase_turn',{method:'POST'});
+      if(res.success) updateCurrentTurn(res.current_turn);
+    });
+
+    $('btn-decrease-turn')?.addEventListener('click',async()=>{
+      const res=await api('decrease_turn',{method:'POST'});
+      if(res.success) updateCurrentTurn(res.current_turn);
+    });
+
+    $('btn-new-user')?.addEventListener('click',()=>openUserModal(null));
+    $('btn-new-turn')?.addEventListener('click',()=>openTurnModal(null));
+    $('user-form-cancel')?.addEventListener('click',()=>{if(typeof closeModal==='function')closeModal('modal-user');});
+    $('turn-form-cancel')?.addEventListener('click',()=>{if(typeof closeModal==='function')closeModal('modal-turn-admin');});
+
+    $('user-form')?.addEventListener('submit',async e=>{
+      e.preventDefault();
+      if(typeof clearFieldErrors==='function') clearFieldErrors(e.target);
+      const btn=e.target.querySelector('[type="submit"]');
+      const id=ST.editingUserId;
+      const data={
+        name:    $('u-name').value.trim(),
+        email:   $('u-email').value.trim(),
+        phone:   $('u-phone').value.trim(),
+        role:    $('u-role').value,
+        is_active: +$('u-active').value
+      };
+      if(!id) data.password=$('u-password').value;
+      const newPass=$('u-new-password')?.value;
+      if(newPass) data.password=newPass;
+      if(id) data.id=+id;
+      if(typeof setLoading==='function') setLoading(btn,true);
+      const res=await api(id?'update_user':'create_user',{method:'POST',body:data});
+      if(typeof setLoading==='function') setLoading(btn,false);
+      if(res.success){
+        if(typeof toast==='function') toast(res.message,'success');
+        if(typeof closeModal==='function') closeModal('modal-user');
+        await loadUsers();
+      } else {
+        if(typeof toast==='function') toast(res.message,'error');
+      }
+    });
+
+    $('turn-form-admin')?.addEventListener('submit',async e=>{
+      e.preventDefault();
+      const btn=e.target.querySelector('[type="submit"]');
+      const id=ST.editingTurnId;
+      const data={service:$('ta-service').value,notes:$('ta-notes').value};
+      if(!id){
+        const uid=$('ta-user-select').value;
+        if(!uid){if(typeof toast==='function')toast('Selecciona un usuario.','error');return;}
+        data.user_id=+uid;
+      } else {
+        data.id=+id;
+        data.status=$('ta-status').value;
+      }
+      if(typeof setLoading==='function') setLoading(btn,true);
+      const res=await api(id?'update_turn':'create_turn',{method:'POST',body:data});
+      if(typeof setLoading==='function') setLoading(btn,false);
+      if(res.success){
+        if(typeof toast==='function') toast(res.message,'success');
+        if(typeof closeModal==='function') closeModal('modal-turn-admin');
+        await loadTurns();
+        if(ST.section==='dashboard') await loadDashboard();
+      } else {
+        if(typeof toast==='function') toast(res.message,'error');
+      }
+    });
+
+    document.getElementById('turns-tbody')?.addEventListener('click',async e=>{
+      const btn=e.target.closest('[data-action]');
+      if(!btn) return;
+      const act=btn.dataset.action;
+      const id=+btn.dataset.id;
+      if(act==='edit-turn'){await openTurnModal(id);return;}
+      if(act==='activate-turn'){
+        const res=await api('update_turn',{method:'POST',body:{id,status:'active'}});
+        if(typeof toast==='function') toast(res.message,res.success?'success':'error');
+        if(res.success){await loadTurns();await loadDashboard();}
+        return;
+      }
+      if(act==='complete-turn'){
+        const res=await api('complete_turn',{method:'POST',body:{id}});
+        if(typeof toast==='function') toast(res.message,res.success?'success':'error');
+        if(res.success){await loadTurns();await loadDashboard();}
+        return;
+      }
+      if(act==='cancel-turn'){
+        const ok=typeof confirm==='function'?await confirm('Cancelar turno','¿Cancelar este turno?','Sí, cancelar',true):window.confirm('¿Cancelar turno?');
+        if(!ok) return;
+        const res=await api('cancel_turn',{method:'POST',body:{id}});
+        if(typeof toast==='function') toast(res.message,res.success?'success':'error');
+        if(res.success){await loadTurns();await loadDashboard();}
+        return;
+      }
+      if(act==='del-turn'){
+        const ok=typeof confirm==='function'?await confirm('Eliminar turno','¿Eliminar este turno?','Eliminar',true):window.confirm('¿Eliminar turno?');
+        if(!ok) return;
+        const res=await api('delete_turn',{method:'POST',body:{id}});
+        if(typeof toast==='function') toast(res.message,res.success?'success':'error');
+        if(res.success){await loadTurns();await loadDashboard();}
+        return;
+      }
+    });
+
+    document.getElementById('users-tbody')?.addEventListener('click',async e=>{
+      const btn=e.target.closest('[data-action]');
+      if(!btn) return;
+      const act=btn.dataset.action;
+      const id=+btn.dataset.id;
+      if(act==='edit-user'){await openUserModal(id);return;}
+      if(act==='del-user'){
+        const name=btn.dataset.name||'este usuario';
+        const ok=typeof confirm==='function'?await confirm('Eliminar usuario',`¿Eliminar a "${name}"?`,'Eliminar',true):window.confirm('¿Eliminar usuario?');
+        if(!ok) return;
+        const res=await api('delete_user',{method:'POST',body:{id}});
+        if(typeof toast==='function') toast(res.message,res.success?'success':'error');
+        if(res.success) await loadUsers();
+        return;
+      }
+    });
+
+    showSection('dashboard');
+
+    if(typeof connectSSE==='function'){
+      connectSSE(data=>{
+        if(data&&data.type==='queue_update'){
+          updateCurrentTurn(data.current_turn);
+          if(ST.section==='dashboard') loadDashboard();
+          if(ST.section==='turns') loadTurns();
+        }
+      });
+    }
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',init);
+  } else {
+    init();
+  }
+})();
 </script>
 </body>
 </html>
