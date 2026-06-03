@@ -71,8 +71,8 @@ try {
         case 'complete_turn': $result = $queue->completeTurn(); break;
         case 'cancel_turn':   $result = $queue->cancelTurn(); break;
         case 'reorder_queue': $result = $queue->reorderQueue(); break;
-        case 'increase_turn': $result = $queue->adjustCurrentTurn(1); break;
-        case 'decrease_turn': $result = $queue->adjustCurrentTurn(-1); break;
+        case 'increase_turn': $result = $queue->advanceTurn(); break;
+        case 'decrease_turn': $result = $queue->regressTurn(); break;
         case 'get_services':  $result = $queue->getServices(); break;
         case 'get_dashboard': $result = $dash->getDashboard(); break;
         case 'sse_queue':
@@ -80,7 +80,7 @@ try {
             $notify->sseQueue();
             exit;
         default:
-            $result = ['success' => false, 'message' => "Accion no reconocida."];
+            $result = ['success' => false, 'message' => 'Accion no reconocida.'];
     }
 
     ob_end_clean();

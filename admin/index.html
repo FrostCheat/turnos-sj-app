@@ -47,7 +47,6 @@
 .draggable-row.drag-over{border-top:2px solid var(--gold)}
 .skel{background:linear-gradient(90deg,var(--gray-100) 25%,var(--gray-50) 50%,var(--gray-100) 75%);background-size:400px 100%;animation:sk 1.4s infinite;border-radius:4px}
 @keyframes sk{from{background-position:-200px 0}to{background-position:200px 0}}
-.today-badge{display:inline-flex;align-items:center;gap:6px;background:var(--gold-pale);border:1px solid rgba(212,160,23,.25);border-radius:20px;padding:3px 10px;font-size:.75rem;color:var(--gold-deep);margin-left:8px;font-weight:500}
 </style>
 </head>
 <body data-page="admin">
@@ -251,7 +250,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" id="user-form-cancel">Cancelar</button>
-        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="submit" class="btn btn-primary" id="user-form-submit">Guardar</button>
       </div>
     </form>
   </div>
@@ -291,7 +290,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" id="turn-form-cancel">Cancelar</button>
-        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="submit" class="btn btn-primary" id="turn-form-submit">Guardar</button>
       </div>
     </form>
   </div>
@@ -299,414 +298,483 @@
 
 <script src="/assets/js/app.js"></script>
 <script>
-(function(){
-  const $  = id => document.getElementById(id);
-  const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  const fmt = s => { if(!s) return '—'; return new Date(s).toLocaleString('es-CO',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); };
-  const sbadge = s => { const m={waiting:'En espera',active:'Activo',completed:'Completado',cancelled:'Cancelado'}; return `<span class="badge badge-${s}">${m[s]??s}</span>`; };
-  const rbadge = r => `<span class="badge badge-${r}">${r==='admin'?'Administrador':'Usuario'}</span>`;
-  const dbg = fn => { let t; return (...a) => { clearTimeout(t); t = setTimeout(()=>fn(...a), 350); }; };
+(function () {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const fmt = s => { if (!s) return '—'; return new Date(s).toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }); };
+  const sbadge = s => { const m = { waiting: 'En espera', active: 'Activo', completed: 'Completado', cancelled: 'Cancelado' }; return `<span class="badge badge-${s}">${m[s] ?? s}</span>`; };
+  const rbadge = r => `<span class="badge badge-${r}">${r === 'admin' ? 'Administrador' : 'Usuario'}</span>`;
+  const deb = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
 
   const ST = {
-    usersPage:1, usersSearch:'', usersPages:1,
-    turnsPage:1, turnsSearch:'', turnsFilter:'', turnsPages:1,
-    section:'dashboard',
-    editingUserId:null,
-    editingTurnId:null,
-    services:[],
-    dragSrc:null
+    usersPage: 1, usersSearch: '', usersPages: 1,
+    turnsPage: 1, turnsSearch: '', turnsFilter: '', turnsPages: 1,
+    section: 'dashboard',
+    editingUserId: null,
+    editingTurnId: null,
+    services: [],
+    dragSrc: null
   };
 
-  const sectionTitles = {dashboard:'Panel general',turns:'Gestión de turnos',users:'Gestión de usuarios'};
+  const sectionTitles = { dashboard: 'Panel general', turns: 'Gestión de turnos', users: 'Gestión de usuarios' };
 
-  function updateCurrentTurn(val){
+  function updateCurrentTurn(val) {
     const el = $('current-turn-admin');
-    if(el) el.textContent = val ?? 0;
+    if (el) el.textContent = val ?? 0;
   }
 
-  function showSection(name){
+  function showSection(name) {
     ST.section = name;
-    document.querySelectorAll('.admin-section').forEach(s => s.style.display='none');
-    const el = $('section-'+name);
-    if(el) el.style.display = 'block';
-    document.querySelectorAll('.sidebar-link[data-section]').forEach(l => l.classList.toggle('active', l.dataset.section===name));
+    document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
+    const el = $('section-' + name);
+    if (el) el.style.display = 'block';
+    document.querySelectorAll('.sidebar-link[data-section]').forEach(l => l.classList.toggle('active', l.dataset.section === name));
     const tt = $('topbar-title');
-    if(tt) tt.textContent = sectionTitles[name] || name;
-    if(name==='dashboard') loadDashboard();
-    if(name==='users') loadUsers();
-    if(name==='turns') loadTurns();
+    if (tt) tt.textContent = sectionTitles[name] || name;
+    if (name === 'dashboard') loadDashboard();
+    if (name === 'users') loadUsers();
+    if (name === 'turns') loadTurns();
   }
 
-  async function loadDashboard(){
+  async function loadDashboard() {
     const res = await api('get_dashboard');
-    if(!res || !res.success) return;
+    if (!res || !res.success) return;
     const s = res.stats;
-    [['stat-total-users',s.total_users],['stat-total-turns',s.total_turns],['stat-waiting',s.waiting_turns],['stat-active',s.active_turns],['stat-completed',s.completed_turns]].forEach(([id,v])=>{
-      const el=$(id); if(el) el.textContent = v??0;
-    });
+    [
+      ['stat-total-users', s.total_users],
+      ['stat-total-turns', s.total_turns],
+      ['stat-waiting', s.waiting_turns],
+      ['stat-active', s.active_turns],
+      ['stat-completed', s.completed_turns]
+    ].forEach(([id, v]) => { const el = $(id); if (el) el.textContent = v ?? 0; });
     updateCurrentTurn(s.current_turn);
 
     const rb = $('recent-turns-body');
-    if(rb){
-      if(!res.recent_turns || !res.recent_turns.length){
-        rb.innerHTML='<tr><td colspan="5" class="empty-state"><div class="empty-state-icon">📋</div><p>Sin turnos recientes.</p></td></tr>';
+    if (rb) {
+      if (!res.recent_turns || !res.recent_turns.length) {
+        rb.innerHTML = '<tr><td colspan="5" class="empty-state"><div class="empty-state-icon">📋</div><p>Sin turnos recientes.</p></td></tr>';
       } else {
-        rb.innerHTML = res.recent_turns.map(t=>`<tr><td><strong>#${t.turn_number}</strong></td><td>${esc(t.user_name)}</td><td>${esc(t.service)}</td><td>${sbadge(t.status)}</td><td>${fmt(t.created_at)}</td></tr>`).join('');
+        rb.innerHTML = res.recent_turns.map(t => `<tr><td><strong>#${t.turn_number}</strong></td><td>${esc(t.user_name)}</td><td>${esc(t.service)}</td><td>${sbadge(t.status)}</td><td>${fmt(t.created_at)}</td></tr>`).join('');
       }
     }
+
     const sb = $('service-stats-body');
-    if(sb){
-      if(!res.by_service || !res.by_service.length){
-        sb.innerHTML='<tr><td colspan="4" class="empty-state"><p>Sin datos aún.</p></td></tr>';
+    if (sb) {
+      if (!res.by_service || !res.by_service.length) {
+        sb.innerHTML = '<tr><td colspan="4" class="empty-state"><p>Sin datos aún.</p></td></tr>';
       } else {
-        sb.innerHTML = res.by_service.map(s=>`<tr><td>${esc(s.service)}</td><td>${s.total}</td><td>${s.completed}</td><td>${s.waiting}</td></tr>`).join('');
+        sb.innerHTML = res.by_service.map(sv => `<tr><td>${esc(sv.service)}</td><td>${sv.total}</td><td>${sv.completed}</td><td>${sv.waiting}</td></tr>`).join('');
       }
     }
   }
 
-  async function loadUsers(){
+  async function loadUsers() {
     const tbody = $('users-tbody');
-    if(!tbody) return;
-    tbody.innerHTML=`<tr><td colspan="7"><div class="skel" style="height:40px;margin:8px 16px"></div></td></tr>`;
-    const res = await api('get_users',{params:{search:ST.usersSearch,page:ST.usersPage,per_page:20}});
-    if(!res||!res.success){tbody.innerHTML=`<tr><td colspan="7" class="empty-state"><p>${esc(res?.message||'Error')}</p></td></tr>`;return;}
-    ST.usersPages = res.pages;
-    const cnt=$('users-count'); if(cnt) cnt.textContent=`${res.total} usuario${res.total!==1?'s':''}`;
-    if(!res.users.length){
-      tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">👥</div><p>Sin usuarios encontrados.</p></div></td></tr>';
-    } else {
-      tbody.innerHTML = res.users.map(u=>`<tr><td>${u.id}</td><td><strong>${esc(u.name)}</strong></td><td>${esc(u.email)}</td><td>${esc(u.phone||'—')}</td><td>${rbadge(u.role)}</td><td><span class="badge ${u.is_active?'badge-active':'badge-cancelled'}">${u.is_active?'Activo':'Inactivo'}</span></td><td><div class="action-btns"><button class="action-btn edit" title="Editar" data-action="edit-user" data-id="${u.id}">✎</button><button class="action-btn delete" title="Eliminar" data-action="del-user" data-id="${u.id}" data-name="${esc(u.name)}">🗑</button></div></td></tr>`).join('');
+    if (!tbody) return;
+    tbody.innerHTML = `<tr><td colspan="7"><div class="skel" style="height:40px;margin:8px 16px"></div></td></tr>`;
+    const res = await api('get_users', { params: { search: ST.usersSearch, page: ST.usersPage, per_page: 20 } });
+    if (!res || !res.success) {
+      tbody.innerHTML = `<tr><td colspan="7" class="empty-state"><p>${esc(res?.message || 'Error al cargar usuarios')}</p></td></tr>`;
+      return;
     }
-    renderPag('users-pagination', ST.usersPage, ST.usersPages, p=>{ST.usersPage=p;loadUsers();});
+    ST.usersPages = res.pages;
+    const cnt = $('users-count');
+    if (cnt) cnt.textContent = `${res.total} usuario${res.total !== 1 ? 's' : ''}`;
+    if (!res.users.length) {
+      tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">👥</div><p>Sin usuarios encontrados.</p></div></td></tr>';
+    } else {
+      tbody.innerHTML = res.users.map(u => `
+        <tr>
+          <td>${u.id}</td>
+          <td><strong>${esc(u.name)}</strong></td>
+          <td>${esc(u.email)}</td>
+          <td>${esc(u.phone || '—')}</td>
+          <td>${rbadge(u.role)}</td>
+          <td><span class="badge ${u.is_active ? 'badge-active' : 'badge-cancelled'}">${u.is_active ? 'Activo' : 'Inactivo'}</span></td>
+          <td><div class="action-btns">
+            <button class="action-btn edit" data-action="edit-user" data-id="${u.id}" title="Editar">✎</button>
+            <button class="action-btn delete" data-action="del-user" data-id="${u.id}" data-name="${esc(u.name)}" title="Eliminar">🗑</button>
+          </div></td>
+        </tr>`).join('');
+    }
+    renderPag('users-pagination', ST.usersPage, ST.usersPages, p => { ST.usersPage = p; loadUsers(); });
   }
 
-  async function loadTurns(){
+  async function loadTurns() {
     const tbody = $('turns-tbody');
-    if(!tbody) return;
-    tbody.innerHTML=`<tr><td colspan="8"><div class="skel" style="height:40px;margin:8px 16px"></div></td></tr>`;
-    const res = await api('get_turns',{params:{search:ST.turnsSearch,status:ST.turnsFilter,page:ST.turnsPage,per_page:20}});
-    if(!res||!res.success){tbody.innerHTML=`<tr><td colspan="8" class="empty-state"><p>${esc(res?.message||'Error')}</p></td></tr>`;return;}
+    if (!tbody) return;
+    tbody.innerHTML = `<tr><td colspan="8"><div class="skel" style="height:40px;margin:8px 16px"></div></td></tr>`;
+    const res = await api('get_turns', { params: { search: ST.turnsSearch, status: ST.turnsFilter, page: ST.turnsPage, per_page: 20 } });
+    if (!res || !res.success) {
+      tbody.innerHTML = `<tr><td colspan="8" class="empty-state"><p>${esc(res?.message || 'Error al cargar turnos')}</p></td></tr>`;
+      return;
+    }
     ST.turnsPages = res.pages;
-    const cnt=$('turns-count'); if(cnt) cnt.textContent=`${res.total} turno${res.total!==1?'s':''}`;
-    if(!res.turns.length){
-      tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="empty-state-icon">🎫</div><p>Sin turnos encontrados.</p></div></td></tr>';
+    const cnt = $('turns-count');
+    if (cnt) cnt.textContent = `${res.total} turno${res.total !== 1 ? 's' : ''}`;
+    if (!res.turns.length) {
+      tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="empty-state-icon">🎫</div><p>Sin turnos encontrados.</p></div></td></tr>';
     } else {
-      tbody.innerHTML = res.turns.map(t=>`<tr class="draggable-row" data-id="${t.id}" draggable="${t.status==='waiting'}">
-        <td style="color:var(--gray-200);cursor:grab;text-align:center;user-select:none">⠿</td>
-        <td><strong>#${t.turn_number}</strong></td>
-        <td>${esc(t.user_name)}</td>
-        <td>${esc(t.service)}</td>
-        <td>${sbadge(t.status)}</td>
-        <td>${t.position??'—'}</td>
-        <td>${fmt(t.created_at)}</td>
-        <td><div class="action-btns">
-          <button class="action-btn edit" title="Editar" data-action="edit-turn" data-id="${t.id}">✎</button>
-          ${t.status==='waiting'?`<button class="action-btn complete" title="Activar" data-action="activate-turn" data-id="${t.id}">▶</button>`:''}
-          ${t.status==='active'?`<button class="action-btn complete" title="Completar" data-action="complete-turn" data-id="${t.id}">✓</button>`:''}
-          ${['waiting','active'].includes(t.status)?`<button class="action-btn cancel" title="Cancelar" data-action="cancel-turn" data-id="${t.id}">✕</button>`:''}
-          <button class="action-btn delete" title="Eliminar" data-action="del-turn" data-id="${t.id}">🗑</button>
-        </div></td>
-      </tr>`).join('');
+      tbody.innerHTML = res.turns.map(t => `
+        <tr class="draggable-row" data-id="${t.id}" draggable="${t.status === 'waiting'}">
+          <td style="color:var(--gray-200);cursor:grab;text-align:center;user-select:none">⠿</td>
+          <td><strong>#${t.turn_number}</strong></td>
+          <td>${esc(t.user_name)}</td>
+          <td>${esc(t.service)}</td>
+          <td>${sbadge(t.status)}</td>
+          <td>${t.position ?? '—'}</td>
+          <td>${fmt(t.created_at)}</td>
+          <td><div class="action-btns">
+            <button class="action-btn edit" data-action="edit-turn" data-id="${t.id}" title="Editar">✎</button>
+            ${t.status === 'waiting' ? `<button class="action-btn complete" data-action="activate-turn" data-id="${t.id}" title="Activar">▶</button>` : ''}
+            ${t.status === 'active' ? `<button class="action-btn complete" data-action="complete-turn" data-id="${t.id}" title="Completar">✓</button>` : ''}
+            ${['waiting', 'active'].includes(t.status) ? `<button class="action-btn cancel" data-action="cancel-turn" data-id="${t.id}" title="Cancelar">✕</button>` : ''}
+            <button class="action-btn delete" data-action="del-turn" data-id="${t.id}" title="Eliminar">🗑</button>
+          </div></td>
+        </tr>`).join('');
       initDrag();
     }
-    renderPag('turns-pagination', ST.turnsPage, ST.turnsPages, p=>{ST.turnsPage=p;loadTurns();});
+    renderPag('turns-pagination', ST.turnsPage, ST.turnsPages, p => { ST.turnsPage = p; loadTurns(); });
   }
 
-  function renderPag(containerId, current, total, onPage){
-    const el=$(containerId);
-    if(!el||total<=1){if(el)el.innerHTML='';return;}
-    let h='';
-    if(current>1) h+=`<button class="page-btn" data-pg="${current-1}">‹</button>`;
-    for(let i=Math.max(1,current-2);i<=Math.min(total,current+2);i++){
-      h+=`<button class="page-btn${i===current?' active':''}" data-pg="${i}">${i}</button>`;
+  function renderPag(containerId, current, total, onPage) {
+    const el = $(containerId);
+    if (!el) return;
+    if (total <= 1) { el.innerHTML = ''; return; }
+    let h = '';
+    if (current > 1) h += `<button class="page-btn" data-pg="${current - 1}">‹</button>`;
+    for (let i = Math.max(1, current - 2); i <= Math.min(total, current + 2); i++) {
+      h += `<button class="page-btn${i === current ? ' active' : ''}" data-pg="${i}">${i}</button>`;
     }
-    if(current<total) h+=`<button class="page-btn" data-pg="${current+1}">›</button>`;
-    el.innerHTML=h;
-    el.querySelectorAll('.page-btn[data-pg]').forEach(b=>b.addEventListener('click',()=>onPage(+b.dataset.pg)));
+    if (current < total) h += `<button class="page-btn" data-pg="${current + 1}">›</button>`;
+    el.innerHTML = h;
+    el.querySelectorAll('.page-btn[data-pg]').forEach(btn => {
+      btn.addEventListener('click', () => onPage(+btn.dataset.pg));
+    });
   }
 
-  async function loadServicesOnce(){
-    if(ST.services.length) return;
+  async function loadServicesOnce() {
+    if (ST.services.length) return;
     const res = await api('get_services');
-    ST.services = (res&&res.services) ? res.services : ['Atención General','Trámites Documentales','Certificados','Consultas','Pagos y Recaudos','Orientación Ciudadana'];
+    ST.services = (res && res.services) ? res.services : ['Atención General', 'Trámites Documentales', 'Certificados', 'Consultas', 'Pagos y Recaudos', 'Orientación Ciudadana'];
   }
 
-  function fillServiceSelect(selId){
-    const sel=$(selId); if(!sel) return;
-    sel.innerHTML='';
-    ST.services.forEach(s=>{const o=document.createElement('option');o.value=o.textContent=s;sel.appendChild(o);});
+  function fillServiceSelect(selId) {
+    const sel = $(selId);
+    if (!sel) return;
+    sel.innerHTML = '';
+    ST.services.forEach(s => { const o = document.createElement('option'); o.value = o.textContent = s; sel.appendChild(o); });
   }
 
-  async function openUserModal(id){
+  async function openUserModal(id) {
     ST.editingUserId = id || null;
     $('user-modal-title').textContent = id ? 'Editar Usuario' : 'Nuevo Usuario';
     const form = $('user-form');
-    if(!form) return;
+    if (!form) return;
     form.reset();
-    if(typeof clearFieldErrors === 'function') clearFieldErrors(form);
-    $('u-pass-group').style.display = id ? 'none' : '';
-    const passInput = $('u-password'); if(passInput) passInput.required = !id;
-    $('u-pass-change-group').style.display = id ? '' : 'none';
-    if(id){
-      const res = await api('get_user',{params:{id}});
-      if(res&&res.success){
-        const u=res.user;
-        $('u-name').value=u.name||'';
-        $('u-email').value=u.email||'';
-        $('u-phone').value=u.phone||'';
-        $('u-role').value=u.role||'user';
-        $('u-active').value=String(u.is_active);
+    if (typeof clearFieldErrors === 'function') clearFieldErrors(form);
+
+    const passGroup = $('u-pass-group');
+    const passChangeGroup = $('u-pass-change-group');
+    const passInput = $('u-password');
+
+    if (id) {
+      if (passGroup) passGroup.style.display = 'none';
+      if (passInput) passInput.required = false;
+      if (passChangeGroup) passChangeGroup.style.display = '';
+    } else {
+      if (passGroup) passGroup.style.display = '';
+      if (passInput) passInput.required = true;
+      if (passChangeGroup) passChangeGroup.style.display = 'none';
+    }
+
+    if (id) {
+      const res = await api('get_user', { params: { id } });
+      if (res && res.success) {
+        const u = res.user;
+        $('u-name').value = u.name || '';
+        $('u-email').value = u.email || '';
+        $('u-phone').value = u.phone || '';
+        $('u-role').value = u.role || 'user';
+        $('u-active').value = String(u.is_active);
       }
     }
-    if(typeof openModal==='function') openModal('modal-user');
+    if (typeof openModal === 'function') openModal('modal-user');
   }
 
-  async function openTurnModal(id){
+  async function openTurnModal(id) {
     ST.editingTurnId = id || null;
     $('turn-modal-title-admin').textContent = id ? 'Editar Turno' : 'Nuevo Turno';
     const form = $('turn-form-admin');
-    if(!form) return;
+    if (!form) return;
     form.reset();
-    if(typeof clearFieldErrors==='function') clearFieldErrors(form);
+    if (typeof clearFieldErrors === 'function') clearFieldErrors(form);
     await loadServicesOnce();
     fillServiceSelect('ta-service');
-    if(!id){
-      $('ta-user-group').style.display='';
-      $('ta-status-group').style.display='none';
-      const usersRes = await api('get_users',{params:{per_page:100}});
-      const sel=$('ta-user-select');
-      if(sel&&usersRes.success){
-        sel.innerHTML='<option value="">— Seleccionar usuario —</option>';
-        usersRes.users.forEach(u=>{const o=document.createElement('option');o.value=u.id;o.textContent=`${u.name} (${u.email})`;sel.appendChild(o);});
+
+    const userGroup = $('ta-user-group');
+    const statusGroup = $('ta-status-group');
+
+    if (!id) {
+      if (userGroup) userGroup.style.display = '';
+      if (statusGroup) statusGroup.style.display = 'none';
+      const usersRes = await api('get_users', { params: { per_page: 100 } });
+      const sel = $('ta-user-select');
+      if (sel && usersRes.success) {
+        sel.innerHTML = '<option value="">— Seleccionar usuario —</option>';
+        usersRes.users.forEach(u => { const o = document.createElement('option'); o.value = u.id; o.textContent = `${u.name} (${u.email})`; sel.appendChild(o); });
       }
     } else {
-      $('ta-user-group').style.display='none';
-      $('ta-status-group').style.display='';
-      const res = await api('get_turn',{params:{id}});
-      if(res&&res.success){
-        const t=res.turn;
-        $('ta-service').value=t.service;
-        $('ta-notes').value=t.notes||'';
-        $('ta-status').value=t.status;
+      if (userGroup) userGroup.style.display = 'none';
+      if (statusGroup) statusGroup.style.display = '';
+      const res = await api('get_turn', { params: { id } });
+      if (res && res.success) {
+        const t = res.turn;
+        $('ta-service').value = t.service;
+        $('ta-notes').value = t.notes || '';
+        $('ta-status').value = t.status;
       }
     }
-    if(typeof openModal==='function') openModal('modal-turn-admin');
+    if (typeof openModal === 'function') openModal('modal-turn-admin');
   }
 
-  function initDrag(){
+  function initDrag() {
     const rows = document.querySelectorAll('.draggable-row[draggable="true"]');
-    rows.forEach(row=>{
-      row.addEventListener('dragstart',e=>{ST.dragSrc=row;e.dataTransfer.effectAllowed='move';row.classList.add('dragging');});
-      row.addEventListener('dragend',()=>{row.classList.remove('dragging');document.querySelectorAll('.draggable-row').forEach(r=>r.classList.remove('drag-over'));});
-      row.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';document.querySelectorAll('.draggable-row').forEach(r=>r.classList.remove('drag-over'));row.classList.add('drag-over');});
-      row.addEventListener('drop',async e=>{
+    rows.forEach(row => {
+      row.addEventListener('dragstart', e => {
+        ST.dragSrc = row;
+        e.dataTransfer.effectAllowed = 'move';
+        row.classList.add('dragging');
+      });
+      row.addEventListener('dragend', () => {
+        row.classList.remove('dragging');
+        document.querySelectorAll('.draggable-row').forEach(r => r.classList.remove('drag-over'));
+      });
+      row.addEventListener('dragover', e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        document.querySelectorAll('.draggable-row').forEach(r => r.classList.remove('drag-over'));
+        row.classList.add('drag-over');
+      });
+      row.addEventListener('drop', async e => {
         e.stopPropagation();
-        if(ST.dragSrc===row) return;
-        const tbody=row.parentNode;
-        const all=Array.from(tbody.querySelectorAll('.draggable-row'));
-        const fi=all.indexOf(ST.dragSrc), ti=all.indexOf(row);
-        if(fi<ti) row.parentNode.insertBefore(ST.dragSrc,row.nextSibling);
-        else row.parentNode.insertBefore(ST.dragSrc,row);
-        const ids=Array.from(tbody.querySelectorAll('.draggable-row')).map(r=>+r.dataset.id);
-        const res=await api('reorder_queue',{method:'POST',body:{ids}});
-        if(!res.success&&typeof toast==='function') toast(res.message,'error');
+        if (ST.dragSrc === row) return;
+        const tbody = row.parentNode;
+        const all = Array.from(tbody.querySelectorAll('.draggable-row'));
+        const fi = all.indexOf(ST.dragSrc);
+        const ti = all.indexOf(row);
+        if (fi < ti) row.parentNode.insertBefore(ST.dragSrc, row.nextSibling);
+        else row.parentNode.insertBefore(ST.dragSrc, row);
+        const ids = Array.from(tbody.querySelectorAll('.draggable-row')).map(r => +r.dataset.id);
+        const res = await api('reorder_queue', { method: 'POST', body: { ids } });
+        if (!res.success && typeof toast === 'function') toast(res.message, 'error');
       });
     });
   }
 
-  async function init(){
-    if(typeof checkSession!=='function'){setTimeout(init,80);return;}
+  async function init() {
+    if (typeof checkSession !== 'function') { setTimeout(init, 80); return; }
     const user = await checkSession();
-    if(!user){location.href='/auth/';return;}
-    if(user.role!=='admin'){location.href='/home/';return;}
+    if (!user) { location.href = '/auth/'; return; }
+    if (user.role !== 'admin') { location.href = '/home/'; return; }
 
-    $('admin-name').textContent=user.name;
-    const ini=user.name[0].toUpperCase();
-    $('admin-initial').textContent=ini;
-    $('admin-avatar-top').textContent=ini;
+    $('admin-name').textContent = user.name;
+    const ini = user.name[0].toUpperCase();
+    $('admin-initial').textContent = ini;
+    $('admin-avatar-top').textContent = ini;
 
-    if(typeof loadCsrf==='function') await loadCsrf();
+    if (typeof loadCsrf === 'function') await loadCsrf();
 
-    const tog=$('sidebar-toggle');
-    const sb=$('admin-sidebar');
-    const ov=$('sidebar-overlay');
-    if(tog){
-      const updTog=()=>{tog.style.display=window.innerWidth<=768?'flex':'none';};
+    const tog = $('sidebar-toggle');
+    const sb = $('admin-sidebar');
+    const ov = $('sidebar-overlay');
+    if (tog) {
+      const updTog = () => { tog.style.display = window.innerWidth <= 768 ? 'flex' : 'none'; };
       updTog();
-      window.addEventListener('resize',updTog);
+      window.addEventListener('resize', updTog);
     }
-    tog?.addEventListener('click',()=>{sb.classList.toggle('open');ov.classList.toggle('open');});
-    ov?.addEventListener('click',()=>{sb.classList.remove('open');ov.classList.remove('open');});
+    tog?.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('open'); });
+    ov?.addEventListener('click', () => { sb.classList.remove('open'); ov.classList.remove('open'); });
 
-    document.querySelectorAll('.sidebar-link[data-section]').forEach(link=>{
-      link.addEventListener('click',e=>{
+    document.querySelectorAll('.sidebar-link[data-section]').forEach(link => {
+      link.addEventListener('click', e => {
         e.preventDefault();
         showSection(link.dataset.section);
-        if(window.innerWidth<=768){sb.classList.remove('open');ov.classList.remove('open');}
+        if (window.innerWidth <= 768) { sb.classList.remove('open'); ov.classList.remove('open'); }
       });
     });
 
-    $('logout-btn-admin')?.addEventListener('click',async()=>{
-      if(typeof api==='function') await api('logout',{method:'POST'});
-      location.href='/auth/';
+    $('logout-btn-admin')?.addEventListener('click', async () => {
+      if (typeof api === 'function') await api('logout', { method: 'POST' });
+      location.href = '/auth/';
     });
 
-    $('admin-search-users')?.addEventListener('input',dbg(e=>{ST.usersSearch=e.target.value;ST.usersPage=1;loadUsers();}));
-    $('admin-search-turns')?.addEventListener('input',dbg(e=>{ST.turnsSearch=e.target.value;ST.turnsPage=1;loadTurns();}));
+    $('admin-search-users')?.addEventListener('input', deb(e => { ST.usersSearch = e.target.value; ST.usersPage = 1; loadUsers(); }, 350));
+    $('admin-search-turns')?.addEventListener('input', deb(e => { ST.turnsSearch = e.target.value; ST.turnsPage = 1; loadTurns(); }, 350));
 
-    document.querySelectorAll('.filter-tab[data-filter]').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        document.querySelectorAll('.filter-tab[data-filter]').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.filter-tab[data-filter]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tab[data-filter]').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        ST.turnsFilter=btn.dataset.filter;
-        ST.turnsPage=1;
+        ST.turnsFilter = btn.dataset.filter;
+        ST.turnsPage = 1;
         loadTurns();
       });
     });
 
-    $('btn-activate-next')?.addEventListener('click',async()=>{
-      const res=await api('activate_next',{method:'POST'});
-      if(typeof toast==='function') toast(res.message,res.success?'success':'warning');
-      if(res.success){await loadDashboard();await loadTurns();}
+    $('btn-activate-next')?.addEventListener('click', async () => {
+      const res = await api('activate_next', { method: 'POST' });
+      if (typeof toast === 'function') toast(res.message, res.success ? 'success' : 'warning');
+      if (res.success) { await loadDashboard(); await loadTurns(); }
     });
 
-    $('btn-increase-turn')?.addEventListener('click',async()=>{
-      const res=await api('increase_turn',{method:'POST'});
-      if(res.success) updateCurrentTurn(res.current_turn);
+    $('btn-increase-turn')?.addEventListener('click', async () => {
+      const res = await api('increase_turn', { method: 'POST' });
+      if (res.success) { updateCurrentTurn(res.current_turn); await loadDashboard(); if (ST.section === 'turns') await loadTurns(); }
+      else if (typeof toast === 'function') toast(res.message, 'warning');
     });
 
-    $('btn-decrease-turn')?.addEventListener('click',async()=>{
-      const res=await api('decrease_turn',{method:'POST'});
-      if(res.success) updateCurrentTurn(res.current_turn);
+    $('btn-decrease-turn')?.addEventListener('click', async () => {
+      const res = await api('decrease_turn', { method: 'POST' });
+      if (res.success) { updateCurrentTurn(res.current_turn); await loadDashboard(); if (ST.section === 'turns') await loadTurns(); }
+      else if (typeof toast === 'function') toast(res.message, 'warning');
     });
 
-    $('btn-new-user')?.addEventListener('click',()=>openUserModal(null));
-    $('btn-new-turn')?.addEventListener('click',()=>openTurnModal(null));
-    $('user-form-cancel')?.addEventListener('click',()=>{if(typeof closeModal==='function')closeModal('modal-user');});
-    $('turn-form-cancel')?.addEventListener('click',()=>{if(typeof closeModal==='function')closeModal('modal-turn-admin');});
+    $('btn-new-user')?.addEventListener('click', () => openUserModal(null));
+    $('btn-new-turn')?.addEventListener('click', () => openTurnModal(null));
 
-    $('user-form')?.addEventListener('submit',async e=>{
+    $('user-form-cancel')?.addEventListener('click', () => { if (typeof closeModal === 'function') closeModal('modal-user'); });
+    $('turn-form-cancel')?.addEventListener('click', () => { if (typeof closeModal === 'function') closeModal('modal-turn-admin'); });
+
+    $('user-form')?.addEventListener('submit', async e => {
       e.preventDefault();
-      if(typeof clearFieldErrors==='function') clearFieldErrors(e.target);
-      const btn=e.target.querySelector('[type="submit"]');
-      const id=ST.editingUserId;
-      const data={
-        name:    $('u-name').value.trim(),
-        email:   $('u-email').value.trim(),
-        phone:   $('u-phone').value.trim(),
-        role:    $('u-role').value,
+      if (typeof clearFieldErrors === 'function') clearFieldErrors(e.target);
+      const btn = $('user-form-submit');
+      const id = ST.editingUserId;
+      const data = {
+        name:      $('u-name').value.trim(),
+        email:     $('u-email').value.trim(),
+        phone:     $('u-phone').value.trim(),
+        role:      $('u-role').value,
         is_active: +$('u-active').value
       };
-      if(!id) data.password=$('u-password').value;
-      const newPass=$('u-new-password')?.value;
-      if(newPass) data.password=newPass;
-      if(id) data.id=+id;
-      if(typeof setLoading==='function') setLoading(btn,true);
-      const res=await api(id?'update_user':'create_user',{method:'POST',body:data});
-      if(typeof setLoading==='function') setLoading(btn,false);
-      if(res.success){
-        if(typeof toast==='function') toast(res.message,'success');
-        if(typeof closeModal==='function') closeModal('modal-user');
+      if (!id) data.password = $('u-password').value;
+      const newPass = $('u-new-password')?.value;
+      if (newPass) data.password = newPass;
+      if (id) data.id = +id;
+      if (typeof setLoading === 'function') setLoading(btn, true);
+      const res = await api(id ? 'update_user' : 'create_user', { method: 'POST', body: data });
+      if (typeof setLoading === 'function') setLoading(btn, false);
+      if (res.success) {
+        if (typeof toast === 'function') toast(res.message, 'success');
+        if (typeof closeModal === 'function') closeModal('modal-user');
         await loadUsers();
+        if (ST.section === 'dashboard') await loadDashboard();
       } else {
-        if(typeof toast==='function') toast(res.message,'error');
+        if (typeof toast === 'function') toast(res.message, 'error');
       }
     });
 
-    $('turn-form-admin')?.addEventListener('submit',async e=>{
+    $('turn-form-admin')?.addEventListener('submit', async e => {
       e.preventDefault();
-      const btn=e.target.querySelector('[type="submit"]');
-      const id=ST.editingTurnId;
-      const data={service:$('ta-service').value,notes:$('ta-notes').value};
-      if(!id){
-        const uid=$('ta-user-select').value;
-        if(!uid){if(typeof toast==='function')toast('Selecciona un usuario.','error');return;}
-        data.user_id=+uid;
+      const btn = $('turn-form-submit');
+      const id = ST.editingTurnId;
+      const data = { service: $('ta-service').value, notes: $('ta-notes').value };
+      if (!id) {
+        const uid = $('ta-user-select').value;
+        if (!uid) { if (typeof toast === 'function') toast('Selecciona un usuario.', 'error'); return; }
+        data.user_id = +uid;
       } else {
-        data.id=+id;
-        data.status=$('ta-status').value;
+        data.id = +id;
+        data.status = $('ta-status').value;
       }
-      if(typeof setLoading==='function') setLoading(btn,true);
-      const res=await api(id?'update_turn':'create_turn',{method:'POST',body:data});
-      if(typeof setLoading==='function') setLoading(btn,false);
-      if(res.success){
-        if(typeof toast==='function') toast(res.message,'success');
-        if(typeof closeModal==='function') closeModal('modal-turn-admin');
+      if (typeof setLoading === 'function') setLoading(btn, true);
+      const res = await api(id ? 'update_turn' : 'create_turn', { method: 'POST', body: data });
+      if (typeof setLoading === 'function') setLoading(btn, false);
+      if (res.success) {
+        if (typeof toast === 'function') toast(res.message, 'success');
+        if (typeof closeModal === 'function') closeModal('modal-turn-admin');
         await loadTurns();
-        if(ST.section==='dashboard') await loadDashboard();
+        if (ST.section === 'dashboard') await loadDashboard();
       } else {
-        if(typeof toast==='function') toast(res.message,'error');
+        if (typeof toast === 'function') toast(res.message, 'error');
       }
     });
 
-    document.getElementById('turns-tbody')?.addEventListener('click',async e=>{
-      const btn=e.target.closest('[data-action]');
-      if(!btn) return;
-      const act=btn.dataset.action;
-      const id=+btn.dataset.id;
-      if(act==='edit-turn'){await openTurnModal(id);return;}
-      if(act==='activate-turn'){
-        const res=await api('update_turn',{method:'POST',body:{id,status:'active'}});
-        if(typeof toast==='function') toast(res.message,res.success?'success':'error');
-        if(res.success){await loadTurns();await loadDashboard();}
+    $('turns-tbody')?.addEventListener('click', async e => {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      const act = btn.dataset.action;
+      const id = +btn.dataset.id;
+
+      if (act === 'edit-turn') { await openTurnModal(id); return; }
+
+      if (act === 'activate-turn') {
+        const res = await api('update_turn', { method: 'POST', body: { id, status: 'active' } });
+        if (typeof toast === 'function') toast(res.message, res.success ? 'success' : 'error');
+        if (res.success) { await loadTurns(); await loadDashboard(); }
         return;
       }
-      if(act==='complete-turn'){
-        const res=await api('complete_turn',{method:'POST',body:{id}});
-        if(typeof toast==='function') toast(res.message,res.success?'success':'error');
-        if(res.success){await loadTurns();await loadDashboard();}
+
+      if (act === 'complete-turn') {
+        const res = await api('complete_turn', { method: 'POST', body: { id } });
+        if (typeof toast === 'function') toast(res.message, res.success ? 'success' : 'error');
+        if (res.success) { await loadTurns(); await loadDashboard(); }
         return;
       }
-      if(act==='cancel-turn'){
-        const ok=typeof confirm==='function'?await confirm('Cancelar turno','¿Cancelar este turno?','Sí, cancelar',true):window.confirm('¿Cancelar turno?');
-        if(!ok) return;
-        const res=await api('cancel_turn',{method:'POST',body:{id}});
-        if(typeof toast==='function') toast(res.message,res.success?'success':'error');
-        if(res.success){await loadTurns();await loadDashboard();}
+
+      if (act === 'cancel-turn') {
+        const ok = typeof confirm === 'function' ? await confirm('Cancelar turno', '¿Cancelar este turno?', 'Sí, cancelar', true) : window.confirm('¿Cancelar turno?');
+        if (!ok) return;
+        const res = await api('cancel_turn', { method: 'POST', body: { id } });
+        if (typeof toast === 'function') toast(res.message, res.success ? 'success' : 'error');
+        if (res.success) { await loadTurns(); await loadDashboard(); }
         return;
       }
-      if(act==='del-turn'){
-        const ok=typeof confirm==='function'?await confirm('Eliminar turno','¿Eliminar este turno?','Eliminar',true):window.confirm('¿Eliminar turno?');
-        if(!ok) return;
-        const res=await api('delete_turn',{method:'POST',body:{id}});
-        if(typeof toast==='function') toast(res.message,res.success?'success':'error');
-        if(res.success){await loadTurns();await loadDashboard();}
+
+      if (act === 'del-turn') {
+        const ok = typeof confirm === 'function' ? await confirm('Eliminar turno', '¿Eliminar este turno?', 'Eliminar', true) : window.confirm('¿Eliminar turno?');
+        if (!ok) return;
+        const res = await api('delete_turn', { method: 'POST', body: { id } });
+        if (typeof toast === 'function') toast(res.message, res.success ? 'success' : 'error');
+        if (res.success) { await loadTurns(); await loadDashboard(); }
         return;
       }
     });
 
-    document.getElementById('users-tbody')?.addEventListener('click',async e=>{
-      const btn=e.target.closest('[data-action]');
-      if(!btn) return;
-      const act=btn.dataset.action;
-      const id=+btn.dataset.id;
-      if(act==='edit-user'){await openUserModal(id);return;}
-      if(act==='del-user'){
-        const name=btn.dataset.name||'este usuario';
-        const ok=typeof confirm==='function'?await confirm('Eliminar usuario',`¿Eliminar a "${name}"?`,'Eliminar',true):window.confirm('¿Eliminar usuario?');
-        if(!ok) return;
-        const res=await api('delete_user',{method:'POST',body:{id}});
-        if(typeof toast==='function') toast(res.message,res.success?'success':'error');
-        if(res.success) await loadUsers();
+    $('users-tbody')?.addEventListener('click', async e => {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      const act = btn.dataset.action;
+      const id = +btn.dataset.id;
+
+      if (act === 'edit-user') { await openUserModal(id); return; }
+
+      if (act === 'del-user') {
+        const name = btn.dataset.name || 'este usuario';
+        const ok = typeof confirm === 'function' ? await confirm('Eliminar usuario', `¿Eliminar a "${name}"?`, 'Eliminar', true) : window.confirm('¿Eliminar usuario?');
+        if (!ok) return;
+        const res = await api('delete_user', { method: 'POST', body: { id } });
+        if (typeof toast === 'function') toast(res.message, res.success ? 'success' : 'error');
+        if (res.success) { await loadUsers(); if (ST.section === 'dashboard') await loadDashboard(); }
         return;
       }
     });
 
     showSection('dashboard');
 
-    if(typeof connectSSE==='function'){
-      connectSSE(data=>{
-        if(data&&data.type==='queue_update'){
-          updateCurrentTurn(data.current_turn);
-          if(ST.section==='dashboard') loadDashboard();
-          if(ST.section==='turns') loadTurns();
-        }
+    if (typeof connectSSE === 'function') {
+      connectSSE(data => {
+        if (!data || data.type !== 'queue_update') return;
+        updateCurrentTurn(data.current_turn);
+        if (ST.section === 'dashboard') loadDashboard();
+        if (ST.section === 'turns') loadTurns();
       });
     }
   }
 
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',init);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }

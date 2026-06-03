@@ -7,11 +7,11 @@ class QueueController {
     }
 
     private function recalcPositions(): void {
+        $this->db->exec("SET @pos = 0");
         $this->db->exec("
-            SET @pos = 0;
             UPDATE turns SET position = (@pos := @pos + 1)
             WHERE status = 'waiting'
-            ORDER BY created_at ASC
+            ORDER BY COALESCE(position, 9999) ASC, created_at ASC
         ");
     }
 
@@ -322,12 +322,53 @@ class QueueController {
         return ['success' => true, 'message' => 'Cola reorganizada.'];
     }
 
-    public function adjustCurrentTurn(int $delta): array {
+    public function advanceTurn(): array {
         AdminMiddleware::handle();
+
+        $activeRow = $this->db->query("SELECT id, turn_number FROM turns WHERE status = 'active' LIMIT 1")->fetch();
+        if ($activeRow) {
+            $this->db->prepare("UPDATE turns SET status = 'completed', completed_at = NOW(), position = NULL WHERE id = ?")->execute([$activeRow['id']]);
+        }
+
+        $next = $this->db->query("SELECT id, turn_number FROM turns WHERE status = 'waiting' ORDER BY position ASC, created_at ASC LIMIT 1")->fetch();
+
+        if ($next) {
+            $this->db->prepare("UPDATE turns SET status = 'active', called_at = NOW(), position = NULL WHERE id = ?")->execute([$next['id']]);
+            $this->db->prepare('UPDATE queue_state SET current_turn = ?, last_updated = NOW() WHERE id = 1')->execute([$next['turn_number']]);
+            $this->recalcPositions();
+            return ['success' => true, 'message' => 'Turno avanzado.', 'current_turn' => (int)$next['turn_number']];
+        }
+
         $state = $this->db->query('SELECT current_turn FROM queue_state WHERE id = 1')->fetch();
-        $current = max(0, (int)$state['current_turn'] + $delta);
-        $this->db->prepare('UPDATE queue_state SET current_turn = ?, last_updated = NOW() WHERE id = 1')->execute([$current]);
-        return ['success' => true, 'message' => 'Turno actual actualizado.', 'current_turn' => $current];
+        $newVal = (int)$state['current_turn'] + 1;
+        $this->db->prepare('UPDATE queue_state SET current_turn = ?, last_updated = NOW() WHERE id = 1')->execute([$newVal]);
+        $this->recalcPositions();
+        return ['success' => true, 'message' => 'Sin más turnos en espera.', 'current_turn' => $newVal];
+    }
+
+    public function regressTurn(): array {
+        AdminMiddleware::handle();
+
+        $activeRow = $this->db->query("SELECT id, turn_number FROM turns WHERE status = 'active' LIMIT 1")->fetch();
+        if ($activeRow) {
+            $maxPos = (int)$this->db->query("SELECT COALESCE(MAX(position),0) FROM turns WHERE status = 'waiting'")->fetchColumn();
+            $this->db->prepare("UPDATE turns SET status = 'waiting', called_at = NULL, position = ?, completed_at = NULL WHERE id = ?")->execute([$maxPos + 1, $activeRow['id']]);
+        }
+
+        $prev = $this->db->query("SELECT id, turn_number FROM turns WHERE status = 'completed' ORDER BY completed_at DESC LIMIT 1")->fetch();
+
+        if ($prev) {
+            $this->db->prepare("UPDATE turns SET status = 'active', called_at = NOW(), completed_at = NULL, position = NULL WHERE id = ?")->execute([$prev['id']]);
+            $this->db->prepare('UPDATE queue_state SET current_turn = ?, last_updated = NOW() WHERE id = 1')->execute([$prev['turn_number']]);
+            $this->recalcPositions();
+            return ['success' => true, 'message' => 'Turno retrocedido.', 'current_turn' => (int)$prev['turn_number']];
+        }
+
+        $state = $this->db->query('SELECT current_turn FROM queue_state WHERE id = 1')->fetch();
+        $newVal = max(0, (int)$state['current_turn'] - 1);
+        $this->db->prepare('UPDATE queue_state SET current_turn = ?, last_updated = NOW() WHERE id = 1')->execute([$newVal]);
+        $this->recalcPositions();
+        return ['success' => true, 'message' => 'Sin turnos completados para retroceder.', 'current_turn' => $newVal];
     }
 
     public function getServices(): array {
